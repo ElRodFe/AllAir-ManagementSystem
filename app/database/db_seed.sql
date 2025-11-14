@@ -1,0 +1,73 @@
+INSERT INTO public."Users" (username, password, role) VALUES
+    ('EliasE', 'hashedpassword123', 'admin'),
+    ('DicmaryD', 'hashedpassword456', 'employee'),
+    ('NicolasD', 'hashedpassword789', 'employee'),
+    ('StevenM', 'hashedpassword91011', 'employee');
+
+INSERT INTO public."Clients" (id, name, phone_number, email) VALUES
+    (1, 'Alice Johnson', '555-0101', 'alice.johnson@example.com'),
+    (2, 'Bob Smith', '555-0102', 'bob.smith@example.com'),
+    (3, 'Charlie Davis', '555-0103', 'charlie.davis@example.com'),
+    (4, 'Diana King', '555-0104', 'diana.king@example.com'),
+    (5, 'Ethan Brown', '555-0105', 'ethan.brown@example.com'),
+    (6, 'Fiona Green', '555-0106', 'fiona.green@example.com'),
+    (7, 'George White', '555-0107', 'george.white@example.com'),
+    (8, 'Hannah Black', '555-0108', 'hannah.black@example.com'),
+    (9, 'Ian Lewis', '555-0109', 'ian.lewis@example.com'),
+    (10, 'Julia Clark', '555-0110', 'julia.clark@example.com'),
+    (11, 'Kevin Hall', '555-0111', 'kevin.hall@example.com'),
+    (12, 'Laura Allen', '555-0112', 'laura.allen@example.com'),
+    (13, 'Michael Young', '555-0113', 'michael.young@example.com'),
+    (14, 'Natalie Scott', '555-0114', 'natalie.scott@example.com'),
+    (15, 'Oliver Adams', '555-0115', 'oliver.adams@example.com'),
+    (16, 'Paula Baker', '555-0116', 'paula.baker@example.com'),
+    (17, 'Quentin Turner', '555-0117', 'quentin.turner@example.com'),
+    (18, 'Rachel Hill', '555-0118', 'rachel.hill@example.com'),
+    (19, 'Steven Wright', '555-0119', 'steven.wright@example.com'),
+    (20, 'Tina Evans', '555-0120', 'tina.evans@example.com');
+
+INSERT INTO public."Vehicles" (id, vehicle_type, brand_model, kilometers, plate_number, owner_id) VALUES
+    (1, 'Car', 'Toyota Corolla 2020', 15000, 'ABC-1010', 1),
+    (2, 'Motorcycle', 'Honda CB500F 2019', 8000, 'XYZ-2021', 2),
+    (3, 'Truck', 'Ford F-150 2018', 30000, 'TRK-3030', 3),
+    (4, 'Car', 'Chevrolet Malibu 2021', 12000, 'CHE-4040', 4),
+    (5, 'SUV', 'Nissan Rogue 2022', 5000, 'NIS-5050', 5),
+    (6, 'Car', 'Hyundai Elantra 2019', 18000, 'HYN-6060', 6),
+    (7, 'Motorcycle', 'Yamaha MT-07 2020', 7000, 'YAM-7070', 7),
+    (8, 'Truck', 'Ram 2500 2017', 40000, 'RAM-8080', 8),
+    (9, 'SUV', 'Kia Sportage 2021', 9000, 'KIA-9090', 9),
+    (10, 'Car', 'Volkswagen Golf 2020', 11000, 'VWG-1111', 10),
+    (11, 'SUV', 'Toyota RAV4 2019', 16000, 'T-R-1212', 11),
+    (12, 'Car', 'Honda Civic 2018', 25000, 'HDC-1313', 12),
+    (13, 'Motorcycle', 'Suzuki GSX-R600 2021', 4000, 'SUZ-1414', 13),
+    (14, 'Truck', 'Chevrolet Silverado 2020', 22000, 'CHV-1515', 14),
+    (15, 'SUV', 'Ford Escape 2022', 3000, 'FRD-1616', 15),
+    (16, 'Car', 'Mazda 3 2019', 14000, 'MZD-1717', 16),
+    (17, 'Motorcycle', 'Kawasaki Ninja 400 2018', 9000, 'KAW-1818', 17),
+    (18, 'Truck', 'GMC Sierra 2017', 35000, 'GMC-1919', 18),
+    (19, 'SUV', 'Hyundai Tucson 2021', 6000, 'HYU-2020', 19),
+    (20, 'Car', 'Subaru Impreza 2020', 10000, 'SUB-2121', 20);
+
+INSERT INTO public.work_orders 
+(id, entry_date, egress_date, client_id, vehicle_id, work_status, payment_status, refrigerant_gas_retrieved, refrigerant_gas_injected, oil_retrieved, oil_injected, detector, spare_parts, details, workers, hours) 
+VALUES
+    (1, '2025-11-01', '2025-11-02', 1, 1, 'completed', 'paid', 200, 200, 500, 500, true, 'Air filter, Brake pads', 'Routine maintenance', 'John Doe', 4),
+    (2, '2025-11-03', '2025-11-04', 2, 2, 'completed', 'bill_sent', 100, 100, 300, 300, false, 'Spark plugs', 'Oil change and inspection', 'Jane Smith', 3),
+    (3, '2025-11-05', NULL, 3, 3, 'pending', 'not_paid', 0, 200, 400, 400, true, 'Brake pads', 'Brake system check', 'Mike Johnson', 5),
+    (4, '2025-11-06', '2025-11-07', 4, 4, 'completed', 'paid', 300, 300, 600, 600, false, 'Battery', 'Full vehicle inspection', 'Anna Lee', 6),
+    (5, '2025-11-08', NULL, 5, 5, 'pending', 'not_requested', 0, 0, 200, 200, true, '', 'Air conditioning refill', 'Tom Clark', 2),
+    (6, '2025-11-09', '2025-11-10', 6, 6, 'completed', 'paid', 200, 200, 500, 500, false, 'Oil filter', 'Oil change and tire rotation', 'Sarah Miller', 4),
+    (7, '2025-11-11', NULL, 7, 7, 'pending', 'not_paid', 100, 100, 300, 300, true, 'Brake fluid', 'Brake and fluid check', 'David Brown', 3),
+    (8, '2025-11-12', '2025-11-13', 8, 8, 'completed', 'paid', 400, 400, 800, 800, false, 'Air filter', 'Engine and oil check', 'Emily Davis', 7),
+    (9, '2025-11-14', NULL, 9, 9, 'pending', 'not_requested', 0, 0, 200, 200, true, '', 'Routine maintenance', 'Chris Wilson', 3),
+    (10, '2025-11-15', '2025-11-16', 10, 10, 'completed', 'bill_sent', 300, 300, 600, 600, false, 'Battery, Spark plugs', 'Full service', 'Laura Martinez', 5),
+    (11, '2025-11-01', '2025-11-02', 11, 11, 'completed', 'paid', 200, 200, 500, 500, true, 'Air filter, Brake pads', 'Routine maintenance', 'John Doe', 4),
+    (12, '2025-11-03', '2025-11-04', 12, 12, 'completed', 'bill_sent', 100, 100, 300, 300, false, 'Spark plugs', 'Oil change and inspection', 'Jane Smith', 3),
+    (13, '2025-11-05', NULL, 13, 13, 'pending', 'not_paid', 0, 200, 400, 400, true, 'Brake pads', 'Brake system check', 'Mike Johnson', 5),
+    (14, '2025-11-06', '2025-11-07', 14, 14, 'completed', 'paid', 300, 300, 600, 600, false, 'Battery', 'Full vehicle inspection', 'Anna Lee', 6),
+    (15, '2025-11-08', NULL, 15, 15, 'pending', 'not_requested', 0, 0, 200, 200, true, '', 'Air conditioning refill', 'Tom Clark', 2),
+    (16, '2025-11-09', '2025-11-10', 16, 16, 'completed', 'paid', 200, 200, 500, 500, false, 'Oil filter', 'Oil change and tire rotation', 'Sarah Miller', 4),
+    (17, '2025-11-11', NULL, 17, 17, 'pending', 'not_paid', 100, 100, 300, 300, true, 'Brake fluid', 'Brake and fluid check', 'David Brown', 3),
+    (18, '2025-11-12', '2025-11-13', 18, 18, 'completed', 'paid', 400, 400, 800, 800, false, 'Air filter', 'Engine and oil check', 'Emily Davis', 7),
+    (19, '2025-11-14', NULL, 19, 19, 'pending', 'not_requested', 0, 0, 200, 200, true, '', 'Routine maintenance', 'Chris Wilson', 3),
+    (20, '2025-11-15', '2025-11-16', 20, 20, 'completed', 'bill_sent', 300, 300, 600, 600, false, 'Battery, Spark plugs', 'Full service', 'Laura Martinez', 5);
