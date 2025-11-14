@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 
+from app.routes import clients_router, user_router, vehicle_router, work_order_router
+
 # Load environment variables
 load_dotenv()
 
@@ -13,14 +15,14 @@ DB_URL = os.getenv("DB_URL")
 engine = create_engine(DB_URL)
 SessionLocal = sessionmaker(autocommit = False, autoflush= False, bind=engine)
 
-
-
+# Starting the APP
 app = FastAPI()
 
-@app.get("/")
-def read_root():
-    print("outch")
-    return {"message": "Hello!"}
+# Router functionalities
+app.include_router(clients_router)
+app.include_router(user_router)
+app.include_router(vehicle_router)
+app.include_router(work_order_router)
 
 @app.get("/test-db")
 def test_db():

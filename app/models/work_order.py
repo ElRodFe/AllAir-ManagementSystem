@@ -18,10 +18,10 @@ class WorkStatus(str, enum.Enum):
 # Define PaymentStatus enum matching your PostgreSQL enum
 class PaymentStatus(str, enum.Enum):
     """Payment status enumeration"""
-    NOT_PAID = "not_paid"
-    PAID = "paid"
-    BILL_SENT = "bill_sent"
-    NOT_REQUESTED = "not_requested"
+    NOT_PAID = "NOT_PAID"
+    PAID = "PAID"
+    BILL_SENT = "BILL_SENT"
+    NOT_REQUESTED = "NOT_REQUESTED"
 
 
 class WorkOrder(Base):

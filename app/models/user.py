@@ -10,8 +10,8 @@ from app.models.base import Base
 # Define the UserRole enum matching your PostgreSQL enum
 class UserRole(str, enum.Enum):
     """User role enumeration for access control"""
-    ADMIN = "admin"
-    EMPLOYEE = "employee"
+    ADMIN = "ADMIN"
+    EMPLOYEE = "EMPLOYEE"
 
 
 class User(Base):
