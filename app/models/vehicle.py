@@ -9,7 +9,7 @@ from app.models.base import Base
 
 class Vehicle(Base):
     
-    __tablename__ = "Vehicles"
+    __tablename__ = "vehicles"
     
     # Primary Key
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -23,7 +23,7 @@ class Vehicle(Base):
     # Foreign Key to Client
     owner_id = Column(
         Integer,
-        ForeignKey('Clients.id', ondelete='CASCADE'),
+        ForeignKey('clients.id', ondelete='CASCADE'),
         nullable=False
     )
     
