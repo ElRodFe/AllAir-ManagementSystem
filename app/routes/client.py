@@ -4,8 +4,10 @@ from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.models.client import Client as ClientModel
+from app.models.user import User as UserModel
 from app.schemas.client import ClientCreate, ClientUpdate, ClientRead
 from app.database.database import get_db
+from app.utils.auth import get_current_active_user, require_admin
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -15,11 +17,15 @@ router = APIRouter(prefix="/clients", tags=["clients"])
 
 
 # ------------------------------------------------------------
-# CREATE CLIENT
+# CREATE CLIENT (AUTHENTICATED)
 # ------------------------------------------------------------
 @router.post("/", response_model=ClientRead, status_code=status.HTTP_201_CREATED)
-def create_client(payload: ClientCreate, db: Session = Depends(get_db)):
-
+def create_client(
+    payload: ClientCreate, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user)
+):
+    """Create a new client. Requires authentication."""
     new_client = ClientModel(**payload.dict())
 
     db.add(new_client)
@@ -29,28 +35,37 @@ def create_client(payload: ClientCreate, db: Session = Depends(get_db)):
         db.refresh(new_client)
     except IntegrityError as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Integrity error creating client :(")
+        raise HTTPException(status_code=400, detail="Integrity error creating client")
     
     return new_client
 
 
 # ------------------------------------------------------------
-# GET ALL CLIENTS
+# GET ALL CLIENTS (AUTHENTICATED)
 # ------------------------------------------------------------
 @router.get("/", response_model=List[ClientRead])
-def list_clients(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-
+def list_clients(
+    skip: int = 0, 
+    limit: int = 100, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user)
+):
+    """Get all clients. Requires authentication."""
     clients = db.query(ClientModel).offset(skip).limit(limit).all()
 
     return clients
 
 
 # ------------------------------------------------------------
-# GET CLIENT BY ID
+# GET CLIENT BY ID (AUTHENTICATED)
 # ------------------------------------------------------------
 @router.get("/{client_id}", response_model=ClientRead)
-def get_client(client_id: int, db: Session = Depends(get_db)):
-
+def get_client(
+    client_id: int, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user)
+):
+    """Get client by ID. Requires authentication."""
     client = db.query(ClientModel).filter(ClientModel.id == client_id).first()
 
     if not client:
@@ -60,11 +75,16 @@ def get_client(client_id: int, db: Session = Depends(get_db)):
 
 
 # ------------------------------------------------------------
-# UPDATE CLIENT BY ID
+# UPDATE CLIENT BY ID (AUTHENTICATED)
 # ------------------------------------------------------------
 @router.put("/{client_id}", response_model=ClientRead)
-def update_client(client_id: int, payload: ClientUpdate, db: Session = Depends(get_db)):
-
+def update_client(
+    client_id: int, 
+    payload: ClientUpdate, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(get_current_active_user)
+):
+    """Update client by ID. Requires authentication."""
     client = db.query(ClientModel).filter(ClientModel.id == client_id).first()
 
     if not client:
@@ -78,16 +98,20 @@ def update_client(client_id: int, payload: ClientUpdate, db: Session = Depends(g
         db.refresh(client)
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=404, detail="Integrity error updating client :(")
+        raise HTTPException(status_code=400, detail="Integrity error updating client")
 
     return client
 
 # ------------------------------------------------------------
-# DELETE CLIENT BY ID
+# DELETE CLIENT BY ID (ADMIN ONLY)
 # ------------------------------------------------------------
 @router.delete("/{client_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_client(client_id: int, db: Session = Depends(get_db)):
-
+def delete_client(
+    client_id: int, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(require_admin)
+):
+    """Delete client by ID. Requires ADMIN role."""
     client = db.query(ClientModel).filter(ClientModel.id == client_id).first()
 
     if not client:
