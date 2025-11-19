@@ -18,7 +18,7 @@ router = APIRouter(prefix="/vehicles", tags=["Vehicles"])
 # ------------------------------------------------------------
 # CREATE VEHICLE
 # ------------------------------------------------------------
-@router.post("/", response_model=VehicleResponse)
+@router.post("/", response_model=VehicleResponse, status_code=status.HTTP_201_CREATED)
 def create_vehicle(vehicle_data: VehicleCreate, db: Session = Depends(get_db)):
 
     owner = db.query(Client).filter(Client.id == vehicle_data.owner_id).first()
@@ -26,11 +26,23 @@ def create_vehicle(vehicle_data: VehicleCreate, db: Session = Depends(get_db)):
     if not owner:
         raise HTTPException(status_code=404, detail="Owner not found")
     
+    # Optional: check for duplicate plate
+
+    existing = db.query(VehicleModel).filter(VehicleModel.plate_number == vehicle_data.plate_number.upper()).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Plate number already exists")
+    
     new_vehicle = VehicleModel(**vehicle_data.dict())
 
     db.add(new_vehicle)
-    db.commit()
-    db.refresh(new_vehicle)
+
+    try:
+        db.commit()
+        db.refresh(new_vehicle)
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error creating vehicle :(")
 
     return new_vehicle
 
@@ -78,11 +90,24 @@ def update_vehicle(vehicle_id: int, updates: VehicleUpdate, db: Session = Depend
         if not owner:
             raise HTTPException(status_code=404, detail="Owner not found")
         
+    if "plate_number" in update_data:
+        plate = update_data["plate_number"].upper()
+        existing = db.query(VehicleModel).filter(
+            VehicleModel.plate_number == plate,
+            VehicleModel.id != vehicle_id  # exclude the current vehicle
+        ).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="Plate number already exists")
+        
     for key, value in update_data.items():
         setattr(vehicle, key, value)
 
-    db.commit()
-    db.refresh(vehicle)
+    try:
+        db.commit()
+        db.refresh(vehicle)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error updating vehicle :(")
 
     return vehicle
 

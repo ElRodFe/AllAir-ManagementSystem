@@ -37,8 +37,13 @@ def create_user(
     )
 
     db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    
+    try:
+        db.commit()
+        db.refresh(new_user)
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error creating user :(")
 
     return new_user
 
