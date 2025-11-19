@@ -37,12 +37,12 @@ class WorkOrder(Base):
     # Foreign Keys
     client_id = Column(
         Integer,
-        ForeignKey('Clients.id', ondelete='CASCADE'),
+        ForeignKey('clients.id', ondelete='CASCADE'),
         nullable=False
     )
     vehicle_id = Column(
         Integer,
-        ForeignKey('Vehicles.id', ondelete='CASCADE'),
+        ForeignKey('vehicles.id', ondelete='CASCADE'),
         nullable=False
     )
     

@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship
 
 
 class Client(Base):
-    __tablename__ = 'Clients'
+    __tablename__ = 'clients'
 
     # Primary key
     id = Column(Integer, primary_key=True, autoincrement=True)
