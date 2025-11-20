@@ -35,7 +35,7 @@ def create_client(
         db.refresh(new_client)
     except IntegrityError as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail=f"Integrity error creating client {e}")
+        raise HTTPException(status_code=400, detail=f"Integrity error creating client")
     
     return new_client
 
