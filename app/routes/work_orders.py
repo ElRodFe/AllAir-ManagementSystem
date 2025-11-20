@@ -1,9 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.database.database import get_db
 from app.models.work_order import WorkOrder as WorkOrderModel
+from app.models.client import Client as ClientModel
+from app.models.vehicle import Vehicle as VehicleModel
 from app.schemas.work_order import (
     WorkOrderCreate,
     WorkOrderUpdate,
@@ -23,14 +26,29 @@ router = APIRouter(
 # ------------------------------------------------------------
 # CREATE WORK ORDER
 # ------------------------------------------------------------
-@router.post("/", response_model=WorkOrderResponse)
+@router.post("/", response_model=WorkOrderResponse, status_code=status.HTTP_201_CREATED)
 def create_work_order(data: WorkOrderCreate, db: Session = Depends(get_db)):
+    client = db.query(ClientModel).filter(ClientModel.id == data.client_id).first()
+    if not client:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    vehicle = db.query(VehicleModel).filter(VehicleModel.id == data.vehicle_id).first()
+    if not vehicle:
+        raise HTTPException(status_code=404, detail="Vehicle not found")
+    
+    if vehicle.owner_id != client.id:
+        raise HTTPException(status_code=400, detail="Vehicle does not belong to the specified client")
     
     new_work_order = WorkOrderModel(**data.dict())
 
     db.add(new_work_order)
-    db.commit()
-    db.refresh(new_work_order)
+
+    try:
+        db.commit()
+        db.refresh(new_work_order)
+    except IntegrityError as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Integrity error creating work order :(")
 
     return new_work_order
 
