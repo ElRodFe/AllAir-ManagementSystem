@@ -12,7 +12,7 @@ class Client(Base):
     # Client Information
     name = Column(String(50),nullable=False)
     phone_number = Column(String(20), nullable=False)
-    email = Column(String(50), nullable=True)  # Email is optional in your schema
+    email = Column(String(50), nullable=True)
 
     # Relationships
     vehicles = relationship("Vehicle", back_populates="owner", cascade="all, delete-orphan")

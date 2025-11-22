@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import List
-
+from pydantic import BaseModel
 from app.database.database import get_db
 from app.models.work_order import WorkOrder as WorkOrderModel
 from app.models.client import Client as ClientModel
@@ -17,6 +17,9 @@ router = APIRouter(
     prefix="/work-orders",
     tags=["Work Orders"]
 )
+
+class MessageResponse(BaseModel):
+    message: str
 
 # ============================================
 # WORK ORDERS CRUD OPERATIONS
@@ -102,11 +105,9 @@ def update_work_order(work_order_id: int, data: WorkOrderUpdate, db: Session = D
 # ------------------------------------------------------------
 # DELETE WORK ORDER BY ID
 # ------------------------------------------------------------
-@router.delete("/{work_order_id}", response_model=WorkOrderResponse)
+@router.delete("/{work_order_id}", response_model=MessageResponse)
 def delete_work_order(work_order_id: int, db: Session = Depends(get_db)):
-
     work_order = db.query(WorkOrderModel).filter(WorkOrderModel.id == work_order_id).first()
-
     if not work_order:
         raise HTTPException(status_code=404, detail="Work order not found")
     
