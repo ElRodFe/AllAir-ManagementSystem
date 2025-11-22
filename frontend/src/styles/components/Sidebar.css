@@ -1,0 +1,31 @@
+aside {
+    background-color: var(--bg-sidebar);
+    color: var(--color-green-100);
+}
+
+.sidebar-header {
+    background-color: var(--color-green-700);
+    height: 83px;
+}
+
+.sidebar-body {
+    flex-direction: column;
+    padding: var(--space-6);
+}
+
+.nav-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var();
+}
+
+.nav-link img {
+    display: block;
+    margin-right: var(--space-4);
+}
+
+.nav-footer {
+    position: absolute;
+    bottom: var(--space-6);
+}

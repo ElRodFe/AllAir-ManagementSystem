@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Alice Johnson",
+    "phone": "555-0101",
+    "email": "alice.johnson@example.com"
+  },
+  {
+    "id": 2,
+    "name": "Bob Smith",
+    "phone": "555-0102",
+    "email": "bob.smith@example.com"
+  },
+  {
+    "id": 3,
+    "name": "Charlie Davis",
+    "phone": "555-0103",
+    "email": "charlie.davis@example.com"
+  },
+  {
+    "id": 4,
+    "name": "Diana King",
+    "phone": "555-0104",
+    "email": "diana.king@example.com"
+  },
+  {
+    "id": 5,
+    "name": "Ethan Brown",
+    "phone": "555-0105",
+    "email": "ethan.brown@example.com"
+  },
+  {
+    "id": 6,
+    "name": "Fiona Green",
+    "phone": "555-0106",
+    "email": "fiona.green@example.com"
+  },
+  {
+    "id": 7,
+    "name": "George White",
+    "phone": "555-0107",
+    "email": "george.white@example.com"
+  },
+  {
+    "id": 8,
+    "name": "Hannah Black",
+    "phone": "555-0108",
+    "email": "hannah.black@example.com"
+  },
+  {
+    "id": 9,
+    "name": "Ian Lewis",
+    "phone": "555-0109",
+    "email": "ian.lewis@example.com"
+  },
+  {
+    "id": 10,
+    "name": "Julia Clark",
+    "phone": "555-0110",
+    "email": "julia.clark@example.com"
+  }
+]

@@ -1,0 +1,42 @@
+.filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.filter-item,
+.filter-sort {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+}
+
+select {
+  padding: 8px 10px;
+  height: 30px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: none;
+}
+
+.sort-toggle {
+  padding: 8px 12px;
+  height: 30px;
+  width: 60px;
+  background: #0a8;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.sort-toggle:hover {
+  background: #066;
+}
