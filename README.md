@@ -131,6 +131,13 @@ uvicorn app.main:app --reload
 
 The API will be available at `http://localhost:8000`
 
+## Test
+
+Execute tests:
+
+```bash
+pytest -q
+
 ## Favorite Quotes
 
     Elias's --> "It isn't over until it's over" - Jeffrey R. Holland
