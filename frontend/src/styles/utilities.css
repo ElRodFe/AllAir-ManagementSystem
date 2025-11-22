@@ -1,0 +1,65 @@
+/* Layout helpers */
+.flex { display: flex; }
+.center { display: flex; justify-content: center; align-items: center; }
+.between { display: flex; justify-content: space-between; align-items: center; }
+.column { display: flex; flex-direction: column; align-items: center;}
+
+
+/* Text helpers */
+.text-muted { color: var(--text-muted); }
+.text-lg { font-size: var(--fs-body-lg); }
+
+.font-hero {
+  font-size: var(--fs-hero);
+}
+
+.font-title {
+  font-size: var(--fs-title);
+}
+
+.font-subtitle {
+  font-size: var(--fs-subtitle);
+}
+
+.font-body-lg {
+  font-size: var(--fs-body-lg);
+}
+
+.font-body {
+  font-size: var(--fs-body);
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.margin-bottom-lg {
+  margin-bottom: var(--space-6);
+}
+
+.margin-bottom-md {
+  margin-bottom: var(--space-4);
+}
+
+.margin-bottom-sm {
+  margin-bottom: var(--space-2);
+}
+
+/* Card layout */
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+}
+
+/* Button */
+.btn {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+}
+.btn-primary {
+  background-color: var(--color-brand-400);
+  color: white;
+}

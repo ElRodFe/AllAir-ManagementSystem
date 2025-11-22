@@ -1,0 +1,87 @@
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 16px;
+  border-top: 1px solid transparent;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.orders-table thead th {
+  background: var(--color-green-400);
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-green-600);
+  font-weight: 600;
+}
+
+.orders-table tbody td {
+  padding: 18px 16px;
+  border-bottom: 1px solid var(--color-green-600);
+  vertical-align: middle;
+}
+
+.col-id {
+  width: 100px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.order-id {
+  font-weight: 600;
+  color: var(--color-blue-600);
+}
+
+.orders-row:hover {
+  background: var(--gray-0);
+}
+
+.no-results td {
+  text-align: center;
+  padding: 24px;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.ws-pending {
+  background: var(--color-orange-400);
+  color: var(--color-orange-600);
+}
+
+.ws-completed {
+  background: var(--color-green-300);
+  color: var(--color-green-600);
+}
+
+.ps-paid {
+  background: var(--color-green-300);
+  color: var(--color-green-600);
+}
+
+.ps-not-paid {
+  background: var(--color-red-400);
+  color: var(--color-red-600);
+}
+
+.ps-bill-sent {
+  background: var(--color-blue-400);
+  color: var(--color-blue-600);
+}
+
+.ps-not-requested {
+  background: var(--gray-50);
+  color: var(--gray-400);
+}

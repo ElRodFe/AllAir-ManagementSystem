@@ -1,0 +1,96 @@
+:root {
+  /* BRAND COLORS */
+  --color-green-100: #F1F7F7;
+  --color-green-200: #D9E3E3;
+  --color-green-300: #C5D5D5;
+  --color-green-400: #88D4BD;
+  --color-green-500: #139A86;
+  --color-green-600: #006156;
+  --color-green-700: #143A3A;
+
+  /* ACCENTS */
+  --color-orange-400: #F9D6A2;
+  --color-orange-500: #EB9155;
+  --color-orange-600: #E85B01;
+
+  --color-blue-400: #88ADD4;
+  --color-blue-500: #132C9A;
+  --color-blue-600: #001460;
+
+  --color-red-400: #DF81A7;
+  --color-red-500: #C12A6E;
+  --color-red-600: #8F0042;
+
+  /* GRAYS */
+  --gray-0: #F1F7F7;
+  --gray-50: #D9E3E3;
+  --gray-100: #C5D5D5;
+  --gray-200: #A9B2B4;
+  --gray-300: #5B6C74;
+  --gray-400: #2D3A3E; 
+ 
+  /* BACKGROUND */
+  --bg-main: #D9E3E3;
+  --bg-sidebar: #006156;
+  --bg-card: #F1F7F7;
+ 
+  /* TEXT COLORS */
+  --text-body: #030F0F;
+  --text-color: #0B2121;
+  --text-muted: #6B7280;
+
+  /* BORDER RADII */
+  --radius-ssm: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* SHADOWS */
+  --shadow-card: 0 1px 4px rgba(0,0,0,0.08);
+
+  /* SPACING SCALE */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* FONT SIZES */
+  --fs-hero: 42px;
+  --fs-title: 32px;
+  --fs-subtitle: 24px;
+  --fs-body-lg: 16px;
+  --fs-body: 14px;
+
+  /* FONT FAMILIES */
+  --font-display: "Inter", sans-serif; 
+  --font-body: "Roboto", sans-serif;
+}
+
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: normal;
+}
+
+p {
+  margin: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
