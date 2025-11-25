@@ -1,5 +1,5 @@
 :root {
-  /* BRAND COLORS */
+  /* Brand Colors */
   --color-green-100: #F1F7F7;
   --color-green-200: #D9E3E3;
   --color-green-300: #C5D5D5;
@@ -8,7 +8,7 @@
   --color-green-600: #006156;
   --color-green-700: #143A3A;
 
-  /* ACCENTS */
+  /* Accents */
   --color-orange-400: #F9D6A2;
   --color-orange-500: #EB9155;
   --color-orange-600: #E85B01;
@@ -21,7 +21,7 @@
   --color-red-500: #C12A6E;
   --color-red-600: #8F0042;
 
-  /* GRAYS */
+  /* Grays */
   --gray-0: #F1F7F7;
   --gray-50: #D9E3E3;
   --gray-100: #C5D5D5;
@@ -29,26 +29,26 @@
   --gray-300: #5B6C74;
   --gray-400: #2D3A3E; 
  
-  /* BACKGROUND */
+  /* Background */
   --bg-main: #D9E3E3;
   --bg-sidebar: #006156;
   --bg-card: #F1F7F7;
  
-  /* TEXT COLORS */
+  /* Text Colors */
   --text-body: #030F0F;
   --text-color: #0B2121;
   --text-muted: #6B7280;
 
-  /* BORDER RADII */
+  /* Border Radius */
   --radius-ssm: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
 
-  /* SHADOWS */
+  /* Shadows */
   --shadow-card: 0 1px 4px rgba(0,0,0,0.08);
 
-  /* SPACING SCALE */
+  /* Spacing Scale */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -58,14 +58,14 @@
   --space-8: 32px;
   --space-10: 40px;
 
-  /* FONT SIZES */
+  /* Font Sizes */
   --fs-hero: 42px;
   --fs-title: 32px;
   --fs-subtitle: 24px;
   --fs-body-lg: 16px;
   --fs-body: 14px;
 
-  /* FONT FAMILIES */
+  /* Font Families */
   --font-display: "Inter", sans-serif; 
   --font-body: "Roboto", sans-serif;
 }
@@ -93,4 +93,24 @@ body {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+label {
+  display: block;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  border: none;
+  outline: none;
+  height: 45px;
+  border-radius: var(--radius-sm);
+  border: var(--gray-200) 1px solid;
+  padding-left: var(--space-4);
+  font-size: var(--fs-body);
 }

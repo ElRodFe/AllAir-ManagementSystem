@@ -1,7 +1,19 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/components/Sidebar.css";
+import { logout } from "../services/authService";
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    try {
+      logout();
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
+  };
+
   return (
     <aside>
       <div className="sidebar-header center">
@@ -30,12 +42,10 @@ export default function Sidebar() {
         </nav>
 
         <div className="nav-footer">
-          <div className="foot-nav-item">
-            <Link className="nav-link" to="/logout">
-              <img src="assets/logout.svg" alt="Log Out" />
-              <span>Log Out</span>
-            </Link>
-          </div>
+          <button className="nav-link logout-button" onClick={handleLogout}>
+            <img src="assets/logout.svg" alt="Logout icon" />
+            <span>Log Out</span>
+          </button>
         </div>
       </div>
     </aside>

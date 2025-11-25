@@ -53,13 +53,14 @@
 
 /* Button */
 .btn {
+  background-color: var(--color-green-500);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 500;
-  border: none;
+  font-weight: 600;
+  color: var(--color-green-100);
 }
-.btn-primary {
-  background-color: var(--color-brand-400);
-  color: white;
+
+.btn:hover {
+  background-color: var(--color-green-600);
 }

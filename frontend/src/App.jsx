@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginLayout from "./layouts/LoginLayout";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import WorkOrders from "./pages/WorkOrders";
@@ -14,14 +17,24 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* Dashboard */}
+        <Route 
+        path="/" 
+        element={
+          <LoginLayout>
+            <Login />
+          </LoginLayout>
+          } 
+        />
+
         <Route
-          path="/"
-          element={
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
             <DashboardLayout>
               <Dashboard />
             </DashboardLayout>
-          }
+          </ProtectedRoute>
+        }
         />
         
         <Route
@@ -51,13 +64,14 @@ export default function App() {
           }
         />
 
-        {/* Clients Page */}
         <Route
           path="/clients"
           element={
-            <DashboardLayout>
-              <Clients />
-            </DashboardLayout>
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <DashboardLayout>
+                <Clients />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
 
