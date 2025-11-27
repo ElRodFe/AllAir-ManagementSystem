@@ -6,11 +6,14 @@ import WorkOrder from "./pages/WorkOrder";
 import CreateWorkOrder from "./pages/CreateWorkOrder";
 import Error401 from "./pages/Error401";
 import Error500 from "./pages/Error500";
+import Clients from "./pages/Clients";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* Dashboard */}
         <Route
           path="/"
           element={
@@ -50,6 +53,17 @@ export default function App() {
         {/* Error Pages - Standalone (no layout) */}
         <Route path="/error/401" element={<Error401 />} />
         <Route path="/error/500" element={<Error500 />} />
+
+        {/* Clients Page */}
+        <Route
+          path="/clients"
+          element={
+            <DashboardLayout>
+              <Clients />
+            </DashboardLayout>
+          }
+        />
+
       </Routes>
     </BrowserRouter>
   );
