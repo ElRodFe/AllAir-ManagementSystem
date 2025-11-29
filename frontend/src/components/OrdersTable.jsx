@@ -1,8 +1,14 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/components/OrdersTable.css";
 import { normalize } from "../utils/util";
 
 export default function OrdersTable({ items }) {
+  const navigate = useNavigate();
+
+  const handleRowClick = (orderId) => {
+    navigate(`/work-order/${orderId}`);
+  };
 
   return (
     <div className="table-wrap">
@@ -25,7 +31,12 @@ export default function OrdersTable({ items }) {
             </tr>
           ) : (
             items.map((it) => (
-              <tr key={it.id} className="orders-row">
+              <tr 
+                key={it.id} 
+                className="orders-row" 
+                onClick={() => handleRowClick(it.id)}
+                style={{ cursor: 'pointer' }}
+              >
                 <td className="order-id col-id">#{it.id}</td>
 
                 <td>{it.customer_name || "—"}</td>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "vehicle_type": "Car",
+    "brand_model": "Toyota Corolla",
+    "kilometers": 124000,
+    "plate_number": "ABC1234",
+    "owner_id": 1
+  },
+  {
+    "id": 2,
+    "vehicle_type": "Truck",
+    "brand_model": "Ford F-150",
+    "kilometers": 89000,
+    "plate_number": "DEF5678",
+    "owner_id": 1
+  },
+  {
+    "id": 3,
+    "vehicle_type": "SUV",
+    "brand_model": "Nissan Rogue",
+    "kilometers": 65000,
+    "plate_number": "XYZ9999",
+    "owner_id": 2
+  }
+]

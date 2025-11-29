@@ -18,7 +18,7 @@ class Vehicle(Base):
     vehicle_type = Column(String(25), nullable=False)
     brand_model = Column(String(50), nullable=False)
     kilometers = Column(Integer, nullable=False)
-    plate_number = Column(String(25), nullable=False)
+    plate_number = Column(String(25), nullable=False, unique=True, index=True)
     
     # Foreign Key to Client
     owner_id = Column(
