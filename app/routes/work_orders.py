@@ -12,6 +12,9 @@ from app.schemas.work_order import (
     WorkOrderUpdate,
     WorkOrderResponse
 )
+# AGREGAR ESTAS IMPORTACIONES
+from app.utils.auth import get_current_user, require_employee_or_admin
+from app.models.user import User as UserModel
 
 router = APIRouter(
     prefix="/work-orders",
@@ -25,12 +28,16 @@ class MessageResponse(BaseModel):
 # WORK ORDERS CRUD OPERATIONS
 # ============================================
 
-
 # ------------------------------------------------------------
 # CREATE WORK ORDER
 # ------------------------------------------------------------
 @router.post("/", response_model=WorkOrderResponse, status_code=status.HTTP_201_CREATED)
-def create_work_order(data: WorkOrderCreate, db: Session = Depends(get_db)):
+def create_work_order(
+    data: WorkOrderCreate, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(require_employee_or_admin)
+):
+    
     client = db.query(ClientModel).filter(ClientModel.id == data.client_id).first()
     if not client:
         raise HTTPException(status_code=404, detail="Client not found")
@@ -60,9 +67,15 @@ def create_work_order(data: WorkOrderCreate, db: Session = Depends(get_db)):
 # GET ALL WORK ORDERS
 # ------------------------------------------------------------
 @router.get("/", response_model=List[WorkOrderResponse])
-def list_work_orders(skip: int = 0, limit: int = 0, db: Session = Depends(get_db)):
-
+def list_work_orders(
+    skip: int = 0, 
+    limit: int = 100, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(require_employee_or_admin)
+):
+    
     work_orders = db.query(WorkOrderModel).offset(skip).limit(limit).all()
+    
     return work_orders
 
 
@@ -70,8 +83,12 @@ def list_work_orders(skip: int = 0, limit: int = 0, db: Session = Depends(get_db
 # GET SINGLE WORK ORDER BY ID
 # ------------------------------------------------------------
 @router.get("/{work_order_id}", response_model=WorkOrderResponse)
-def get_work_order(work_order_id: int, db: Session = Depends(get_db)):
-
+def get_work_order(
+    work_order_id: int, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(require_employee_or_admin)
+):
+    
     work_order = db.query(WorkOrderModel).filter(WorkOrderModel.id == work_order_id).first()
 
     if not work_order:
@@ -84,8 +101,13 @@ def get_work_order(work_order_id: int, db: Session = Depends(get_db)):
 # UPDATE WORK ORDER BY ID
 # ------------------------------------------------------------
 @router.put("/{work_order_id}", response_model=WorkOrderResponse)
-def update_work_order(work_order_id: int, data: WorkOrderUpdate, db: Session = Depends(get_db)):
-
+def update_work_order(
+    work_order_id: int, 
+    data: WorkOrderUpdate, 
+    db: Session = Depends(get_db),
+    current_user: UserModel = Depends(require_employee_or_admin)
+):
+    
     work_order = db.query(WorkOrderModel).filter(WorkOrderModel.id == work_order_id).first()
 
     if not work_order:
@@ -115,4 +137,3 @@ def delete_work_order(work_order_id: int, db: Session = Depends(get_db)):
     db.commit()
     
     return {"message": "Work order deleted"}
-    

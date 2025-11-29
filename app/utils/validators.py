@@ -11,10 +11,17 @@ def validate_required_string(value: str, field: str) -> str:
     return value
 
 
-def validate_optional_string(value: Optional[str], field: str) -> Optional[str]:
-    if value is not None and value.strip() == "":
-        raise ValueError(f"{field} cannot be empty or spaces only")
-    return value
+def validate_optional_string(value: Optional[str], field_name: str) -> Optional[str]:
+    if value is None:
+        return None
+
+    if isinstance(value, str) and value.strip() == "":
+        return None
+
+    if isinstance(value, str):
+        return value.strip()
+
+    return str(value).strip()
 
 
 # -----------------------------
