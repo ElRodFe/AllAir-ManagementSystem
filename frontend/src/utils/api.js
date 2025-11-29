@@ -21,7 +21,6 @@ export function isAuthenticated() {
 }
 
 export async function loginUser(credentials) {
-  
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: {
@@ -48,18 +47,12 @@ export function logout() {
 }
 
 // ============================================
-// DATA FETCHING FUNCTIONS
+// CLIENTS
 // ============================================
 
 export async function getClients() {
-  const token = getToken();
-  if (!token) throw new Error("Not authenticated");
-
   const res = await fetch(`${API_URL}/clients/`, {
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
+    headers: authHeaders()
   });
 
   if (res.status === 401) {
@@ -67,26 +60,49 @@ export async function getClients() {
     throw new Error("Authentication failed");
   }
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch clients: ${res.status}`);
+  if (!res.ok) throw new Error(`Failed to fetch clients: ${res.status}`);
+
+  return res.json();
+}
+
+export async function getClientById(id) {
+  const res = await fetch(`${API_URL}/clients/${id}`, {
+    headers: authHeaders()
+  });
+
+  if (res.status === 401) {
+    logout();
+    throw new Error("Authentication failed");
   }
+
+  if (!res.ok) throw new Error(`Failed to fetch client ${id}: ${res.status}`);
+
+  return res.json();
+}
+
+// ============================================
+// WORK ORDERS
+// ============================================
+
+export async function createWorkOrder(data) {
+  const res = await fetch(`${API_URL}/work-orders/`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Error creating work order");
 
   return res.json();
 }
 
 export async function getWorkOrders() {
-  
-  const token = getToken();
-  
   const res = await fetch(`${API_URL}/work-orders/`, {
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
-    }
+    headers: authHeaders()
   });
-  
+
   if (res.status === 401) {
-    localStorage.removeItem("access_token");
+    logout();
     throw new Error("Not authenticated");
   }
 
@@ -96,6 +112,52 @@ export async function getWorkOrders() {
     throw new Error(`Error obtaining orders: ${res.status} - ${errorText}`);
   }
 
-  const data = await res.json();
-  return data;
+  return res.json();
+}
+
+export async function getWorkOrderById(id) {
+  const res = await fetch(`${API_URL}/work-orders/${id}`, {
+    headers: authHeaders()
+  });
+
+  if (res.status === 401) {
+    logout();
+    throw new Error("Not authenticated");
+  }
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Failed to fetch work order ${id}: ${res.status} - ${errorText}`);
+  }
+
+  return res.json();
+}
+
+export async function editWorkOrder(id, data) {
+  const res = await fetch(`${API_URL}/work-orders/${id}`, {
+    method: "PUT",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Error editing work order ${id}: ${res.status} - ${errorText}`);
+  }
+
+  return res.json();
+}
+
+export async function deleteWorkOrder(id) {
+  const response = await fetch(`${API_URL}/work-orders/${id}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to delete work order");
+  }
+
+  return true;
 }

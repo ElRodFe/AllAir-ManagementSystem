@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../styles/components/OrdersTable.css";
 import { normalize } from "../utils/util";
 
-export default function OrdersTable({ items }) {
+export default function OrdersTable({ items, onEdit, onDelete }) {
   const navigate = useNavigate();
 
   const handleRowClick = (orderId) => {
@@ -59,6 +59,36 @@ export default function OrdersTable({ items }) {
                   {it.entry_date
                     ? new Date(it.entry_date).toLocaleDateString()
                     : "—"}
+                </td>
+                <td>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/work-order/${it.id}`);
+                    }}
+                  >
+                    Details
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit(it);
+                    }}
+                  >
+                    Edit
+                  </button>
+                </td>
+                <td>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(it.id);
+                    }}
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))
