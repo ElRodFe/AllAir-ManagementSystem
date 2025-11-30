@@ -40,7 +40,7 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
                 <td className="order-id col-id">#{it.id}</td>
 
                 <td>
-                  {it.customer_id ? (
+                  {it.client_id ? (
                     <Link 
                       to={`/clients/${it.client_id}`} 
                       onClick={(e) => e.stopPropagation()}

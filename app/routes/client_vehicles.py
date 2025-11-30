@@ -27,7 +27,7 @@ def create_vehicle_for_client(client_id: int, vehicle: VehicleCreate, db: Sessio
         raise HTTPException(status_code=404, detail="Client not found")
 
     new_vehicle = VehicleModel(
-        owner_id=vehicle.owner_id,
+        owner_id=client_id,
         vehicle_type=vehicle.vehicle_type,
         brand_model=vehicle.brand_model,
         kilometers=vehicle.kilometers,

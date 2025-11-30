@@ -39,7 +39,7 @@ export default function ClientsPage() {
 
     try {
       await createClient(data);
-      await loadData();
+      await loadClients();
       closeAddClientModal();
       alert("Client added successfully!");
     } catch (err) {
@@ -97,7 +97,7 @@ export default function ClientsPage() {
               {clients.map((client) => (
                 <tr key={client.id}>
                   <td>{client.name}</td>
-                  <td>{client.phone}</td>
+                  <td>{client.phone_number}</td>
                   <td>{client.email}</td>
                   <td>
                     <Link to={`/clients/${client.id}`}>
