@@ -2,20 +2,74 @@ import { useEffect, useState } from "react";
 import Header from "../components/Header";
 import "../styles/pages/Clients.css";
 import { Link } from "react-router-dom";
-
-//Temporal Mock data
-import sampleClients from "../data/sampleCustomers.json";
+import Modal from "../components/Modal";
+import { getClients, createClient } from "../utils/api";
 
 export default function ClientsPage() {
   const [clients, setClients] = useState([]);
+  const [showAddClientModal, setShowAddClientModal] = useState(false);
+
+  const loadClients = async () => {
+    try {
+      const data = await getClients();
+      setClients(data);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to load clients: " + err.message);
+    }
+  };
 
   useEffect(() => {
-    // Using mock data for now
-    setClients(sampleClients);
+    loadClients();
   }, []);
+
+  // Create client
+  const openAddClientModal = () => setShowAddClientModal(true);
+  const closeAddClientModal = () => setShowAddClientModal(false);
+
+  const handleCreateClient = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+
+    const data = {
+      name: form.name.value,
+      phone_number: form.phone.value,
+      email: form.email.value || null,
+    };
+
+    try {
+      await createClient(data);
+      await loadData();
+      closeAddClientModal();
+      alert("Client added successfully!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to add client: " + err.message);
+    }
+  };
 
   return (
     <>
+      <Modal open={showAddClientModal} onClose={closeAddClientModal} title="Add Client">
+        <form className="modal-form" onSubmit={handleCreateClient}>
+          <label>
+            Name:
+            <input type="text" name="name" required />
+          </label>
+          <label>
+            Phone:
+            <input type="text" name="phone" required />
+          </label>
+          <label>
+            Email (optional):
+            <input type="email" name="email" />
+          </label>
+          <div className="modal-actions">
+            <button type="button" onClick={closeAddClientModal}>Cancel</button>
+             <button type="submit">Create</button>
+          </div>
+        </form>
+      </Modal>
       <Header icon_url="assets/user.svg" title="Clients" username="John Doe" />
 
       <div className="clients-page">
@@ -23,8 +77,8 @@ export default function ClientsPage() {
         <div className="between margin-bottom-md">
           <h2 className="font-title">Clients List</h2>
 
-          <button className="btn btn-primary">
-            + Create New Client
+          <button className="add-client-btn" onClick={openAddClientModal}>
+            + Add Client
           </button>
         </div>
 

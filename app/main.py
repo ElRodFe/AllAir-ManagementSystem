@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
 
-from app.routes import auth_router, clients_router, user_router, vehicle_router, work_order_router
+from app.routes import auth_router, clients_router, user_router, vehicle_router, work_order_router, client_vehicles_router
 
 # Load environment variables
 load_dotenv()
@@ -34,6 +34,7 @@ app.include_router(clients_router)
 app.include_router(user_router)
 app.include_router(vehicle_router)
 app.include_router(work_order_router)
+app.include_router(client_vehicles_router)
 
 @app.get("/test-db")
 def test_db():

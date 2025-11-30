@@ -80,6 +80,18 @@ export async function getClientById(id) {
   return res.json();
 }
 
+export async function createClient(data) {
+  const res = await fetch(`${API_URL}/clients`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to create client");
+
+  return await res.json();
+}
+
 // ============================================
 // WORK ORDERS
 // ============================================
@@ -160,4 +172,39 @@ export async function deleteWorkOrder(id) {
   }
 
   return true;
+}
+
+// ============================================
+// GET CLIENT AND ADD VEHICLE
+// ============================================
+
+export async function getClientVehicles(clientId) {
+  const res = await fetch(`${API_URL}/clients/${clientId}/vehicles`);
+
+  if (!res.ok) throw new Error("Failed to fetch vehicles");
+
+  return await res.json();
+}
+
+export async function addVehicle(clientId, data) {
+  const res = await fetch(`${API_URL}/clients/${clientId}/vehicles`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+
+  if (!res.ok) throw new Error("Failed to add vehicle");
+
+  return await res.json();
+}
+
+export async function deleteVehicle(clientId, vehicleId) {
+  const res = await fetch(`${API_URL}/clients/${clientId}/vehicles/${vehicleId}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+
+  if (!res.ok) throw new Error("Failed to delete vehicle");
+
+  return await res.json();
 }

@@ -9,7 +9,15 @@ import Filters from '../components/Filters';
 import Pagination from '../components/Paginations';
 import useDebounce from '../utils/useDebounce';
 import Modal from "../components/Modal";
-import { getWorkOrders, getClients, isAuthenticated, loginUser, createWorkOrder, editWorkOrder, deleteWorkOrder } from "../utils/api";
+import { 
+  getWorkOrders, 
+  getClients, 
+  isAuthenticated, 
+  loginUser, 
+  createWorkOrder, 
+  editWorkOrder, 
+  deleteWorkOrder,
+  createClient } from "../utils/api";
 
 function uniqueValues(items, key) {
   return Array.from(new Set(items.map(i => i[key]).filter(Boolean))).sort();
@@ -23,7 +31,6 @@ export default function Dashboard() {
   const debouncedSearch = useDebounce(search, 300);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [showAddModal, setShowAddModal] = useState(false);
 
   const handleAddWorkOrder = () => setShowAddModal(true);
@@ -143,6 +150,7 @@ export default function Dashboard() {
 
       return {
         ...order,
+        customer_id: cust ? cust.id : null,
         customer_name: cust ? cust.name : "Unknown",
         customer_phone: cust ? cust.phone_number : "N/A",
         customer_email: cust ? cust.email : "N/A",

@@ -1,5 +1,5 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../styles/components/OrdersTable.css";
 import { normalize } from "../utils/util";
 
@@ -39,7 +39,18 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
               >
                 <td className="order-id col-id">#{it.id}</td>
 
-                <td>{it.customer_name || "—"}</td>
+                <td>
+                  {it.customer_id ? (
+                    <Link 
+                      to={`/clients/${it.client_id}`} 
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {it.customer_name || "—"}
+                    </Link>
+                  ) : (
+                    "—"
+                  )}
+                </td>
 
                 <td>{it.customer_phone || "—"}</td>
 
