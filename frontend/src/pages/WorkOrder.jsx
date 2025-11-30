@@ -72,7 +72,7 @@ export default function WorkOrder() {
   if (loading) {
     return (
       <>
-        <Header icon_url="assets/order.svg" title="Work Order" username="John Doe" />
+        <Header icon_url="assets/order.svg" title="Work Order"/>
         <div className="work-order-page">
           <div className="loading">Loading work order...</div>
         </div>
@@ -83,7 +83,7 @@ export default function WorkOrder() {
   if (error || !workOrder) {
     return (
       <>
-        <Header icon_url="assets/order.svg" title="Work Order" username="John Doe" />
+        <Header icon_url="assets/order.svg" title="Work Order"/>
         <div className="work-order-page">
           <div className="error-message">{error || 'Work order not found'}</div>
           <button onClick={() => navigate('/')}>Back to Dashboard</button>
@@ -237,7 +237,7 @@ export default function WorkOrder() {
           </form>
         )}
       </Modal>
-      <Header icon_url="assets/order.svg" title="Work Order Details" username="John Doe" />
+      <Header icon_url="assets/order.svg" title="Work Order Details"/>
       
       <div className="work-order-page">
         <div className="work-order-header">

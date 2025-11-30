@@ -29,3 +29,35 @@ aside {
     position: absolute;
     bottom: var(--space-6);
 }
+
+
+.nav-item.active {
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+    border-bottom: 1px solid var(--gray-0);
+}
+
+.nav-item.active .nav-link{
+    animation: slideIn 0.4s ease-out forwards;
+    opacity: 0;
+    transform: translateX(-15px); 
+}
+
+.logout-button {
+    display: flex;
+    align-items: center;
+    color: var(--color-green-100);
+    font-size: var(--fs-subtitle);
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

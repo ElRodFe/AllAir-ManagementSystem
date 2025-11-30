@@ -7,10 +7,6 @@ export default function Error401() {
   }, []);
 
   const handleLogin = () => {
-    window.location.href = '/login';
-  };
-
-  const handleGoHome = () => {
     window.location.href = '/';
   };
 
@@ -30,9 +26,6 @@ export default function Error401() {
         <div className="error-actions">
           <button className="btn-primary" onClick={handleLogin}>
             Go to Login
-          </button>
-          <button className="btn-secondary" onClick={handleGoHome}>
-            Go to Homepage
           </button>
         </div>
       </div>

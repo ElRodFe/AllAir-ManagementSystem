@@ -21,6 +21,9 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
             <th>Work Status</th>
             <th>Payment Status</th>
             <th>Entry Date</th>
+            <th>Actions</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
 

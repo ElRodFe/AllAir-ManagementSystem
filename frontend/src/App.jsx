@@ -40,9 +40,11 @@ export default function App() {
         <Route
           path="/work-orders"
           element={
-            <DashboardLayout>
-              <WorkOrders />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <WorkOrders />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
         
@@ -58,16 +60,18 @@ export default function App() {
         <Route
           path="/work-order/:id"
           element={
-            <DashboardLayout>
-              <WorkOrder />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <WorkOrder />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/clients"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <ProtectedRoute>
               <DashboardLayout>
                 <Clients />
               </DashboardLayout>
@@ -79,9 +83,11 @@ export default function App() {
         <Route
           path="/clients/:id"
           element={
-            <DashboardLayout>
-              <ClientProfile />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ClientProfile />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
         
