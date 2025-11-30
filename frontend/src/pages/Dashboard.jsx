@@ -9,7 +9,15 @@ import Filters from '../components/Filters';
 import Pagination from '../components/Paginations';
 import useDebounce from '../utils/useDebounce';
 import Modal from "../components/Modal";
-import { getWorkOrders, getClients, isAuthenticated, loginUser, createWorkOrder, editWorkOrder, deleteWorkOrder } from "../utils/api";
+import { 
+  getWorkOrders, 
+  getClients, 
+  isAuthenticated, 
+  loginUser, 
+  createWorkOrder, 
+  editWorkOrder, 
+  deleteWorkOrder,
+  createClient } from "../utils/api";
 
 function uniqueValues(items, key) {
   return Array.from(new Set(items.map(i => i[key]).filter(Boolean))).sort();
@@ -23,8 +31,10 @@ export default function Dashboard() {
   const debouncedSearch = useDebounce(search, 300);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
   const [showAddModal, setShowAddModal] = useState(false);
+  const [clientSearch, setClientSearch] = useState("");
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [clientVehicles, setClientVehicles] = useState([]);
 
   const handleAddWorkOrder = () => setShowAddModal(true);
   const closeModal = () => setShowAddModal(false);
@@ -68,6 +78,8 @@ export default function Dashboard() {
 
   const openEditModal = (order) => {
     setEditingOrder(order);
+    const cust = realClients.find(c => c.id === order.client_id);
+    setSelectedClient(cust || null);
     setEditModalOpen(true);
   };
 
@@ -143,6 +155,7 @@ export default function Dashboard() {
 
       return {
         ...order,
+        customer_id: cust ? cust.id : null,
         customer_name: cust ? cust.name : "Unknown",
         customer_phone: cust ? cust.phone_number : "N/A",
         customer_email: cust ? cust.email : "N/A",
@@ -234,13 +247,58 @@ export default function Dashboard() {
 
           {/* ==================== FOREIGN KEYS ==================== */}
           <label>
-            Client ID:
-            <input type="number" name="client_id" required />
+            Search client by name:
+            <input
+              type="text"
+              value={clientSearch}
+              onChange={(e) => {
+                const text = e.target.value;
+                setClientSearch(text);
+
+                const found = clients.find(c =>
+                  c.name.toLowerCase().includes(text.toLowerCase())
+                );
+
+                setSelectedClient(found || null);
+
+                if (found) {
+                  fetch(`http://localhost:8000/clients/${found.id}/vehicles`)
+                    .then(res => res.json())
+                    .then(setClientVehicles)
+                    .catch(console.error);
+                } else {
+                  setClientVehicles([]);
+                }
+              }}
+              placeholder="Example: Annie Brooks"
+              required
+            />
           </label>
 
+          {selectedClient && (
+            <input
+              type="hidden"
+              name="client_id"
+              value={selectedClient.id}
+            />
+          )}
+            
+          {selectedClient && (
+            <p style={{ fontWeight: "bold", marginTop: "4px" }}>
+              Selected client: {selectedClient.name} (ID {selectedClient.id})
+            </p>
+          )}
+
           <label>
-            Vehicle ID:
-            <input type="number" name="vehicle_id" required />
+            Vehicle:
+            <select name="vehicle_id" required disabled={!clientVehicles.length}>
+              <option value="">Choose a vehicle</option>
+              {clientVehicles.map(v => (
+                <option key={v.id} value={v.id}>
+                  {v.plate_number} — {v.brand_model}
+                </option>
+              ))}
+            </select>
           </label>
 
           {/* ==================== STATUS FIELDS ==================== */}
@@ -334,7 +392,7 @@ export default function Dashboard() {
               const data = {
                 entry_date: form.entry_date.value,
                 egress_date: form.egress_date.value || null,
-                client_id: Number(form.client_id.value),
+                client_id: selectedClient ? selectedClient.id : null,
                 vehicle_id: Number(form.vehicle_id.value),
                 work_status: form.work_status.value,
                 payment_status: form.payment_status.value,
