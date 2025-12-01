@@ -1,22 +1,22 @@
 .overview-box {
-    justify-content: space-between;
-    margin-bottom: var(--space-10);
+  justify-content: space-between;
+  margin-bottom: var(--space-10);
 }
 
 .dashboard {
-    padding: var(--space-5);
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 83px);
-    padding: var(--space-5);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 83px);
+  padding: var(--space-5);
 }
 
 .app-shell {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-3);
-    border-radius: var(--radius-md);
-    background-color: var(--bg-card);
-    overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  overflow: hidden;
 }

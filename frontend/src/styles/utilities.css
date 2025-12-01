@@ -1,13 +1,30 @@
 /* Layout helpers */
-.flex { display: flex; }
-.center { display: flex; justify-content: center; align-items: center; }
-.between { display: flex; justify-content: space-between; align-items: center; }
-.column { display: flex; flex-direction: column; align-items: center;}
-
+.flex {
+  display: flex;
+}
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 /* Text helpers */
-.text-muted { color: var(--text-muted); }
-.text-lg { font-size: var(--fs-body-lg); }
+.text-muted {
+  color: var(--text-muted);
+}
+.text-lg {
+  font-size: var(--fs-body-lg);
+}
 
 .font-hero {
   font-size: var(--fs-hero);

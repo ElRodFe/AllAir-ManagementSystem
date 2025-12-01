@@ -4,11 +4,11 @@ header {
   padding: var(--space-2) var(--space-5);
 }
 
-.header-title{
+.header-title {
   gap: var(--space-2);
 }
 
-.header-user img{
+.header-user img {
   width: 50px;
   height: auto;
 }

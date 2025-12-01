@@ -14,17 +14,25 @@
   right: var(--space-5);
   width: 50px;
   height: 50px;
-  border-radius:100%;
+  border-radius: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: var(--fs-body);
 }
 
-.stat-icon.orange { background: var(--color-orange-400); }
-.stat-icon.blue   { background: var(--color-blue-400); }
-.stat-icon.green  { background: var(--color-green-400); }
-.stat-icon.red    { background: var(--color-red-400); }
+.stat-icon.orange {
+  background: var(--color-orange-400);
+}
+.stat-icon.blue {
+  background: var(--color-blue-400);
+}
+.stat-icon.green {
+  background: var(--color-green-400);
+}
+.stat-icon.red {
+  background: var(--color-red-400);
+}
 
 .stat-value {
   font-size: var(--fs-hero);
@@ -35,7 +43,7 @@
   color: var(--text-color);
 }
 
-.stat-info{
+.stat-info {
   position: absolute;
   bottom: var(--space-5);
 }

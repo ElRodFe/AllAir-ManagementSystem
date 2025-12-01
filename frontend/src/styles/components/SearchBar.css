@@ -1,19 +1,19 @@
-.searchbar{
+.searchbar {
   background: none;
   border-radius: var(--radius-ssm);
-  padding:6px;
-  border:1px solid var(--gray-200);
+  padding: 6px;
+  border: 1px solid var(--gray-200);
   height: 33px;
 }
-.searchbar-input{
+.searchbar-input {
   background: none;
-  border:0;
-  outline:none;
-  padding:8px 10px;
-  min-width:220px;
-  color: #143A3A;
+  border: 0;
+  outline: none;
+  padding: 8px 10px;
+  min-width: 220px;
+  color: #143a3a;
 }
-.search-icon{
-  border:0;
-  padding:6px 10px;
+.search-icon {
+  border: 0;
+  padding: 6px 10px;
 }
