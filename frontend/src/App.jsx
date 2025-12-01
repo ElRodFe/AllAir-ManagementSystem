@@ -1,4 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import LoginLayout from "./layouts/LoginLayout";
+import Login from "./pages/Login";
+import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import WorkOrders from "./pages/WorkOrders";
@@ -8,31 +11,43 @@ import Error401 from "./pages/Error401";
 import Error500 from "./pages/Error500";
 import Clients from "./pages/Clients";
 import ClientProfile from "./pages/ClientProfile";
+import VehicleDetails from "./pages/VehicleDetails";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* Dashboard */}
         <Route
           path="/"
           element={
-            <DashboardLayout>
-              <Dashboard />
-            </DashboardLayout>
+            <LoginLayout>
+              <Login />
+            </LoginLayout>
           }
         />
-        
+
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Dashboard />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/work-orders"
           element={
-            <DashboardLayout>
-              <WorkOrders />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <WorkOrders />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/work-orders/create"
           element={
@@ -41,23 +56,26 @@ export default function App() {
             </DashboardLayout>
           }
         />
-        
+
         <Route
           path="/work-order/:id"
           element={
-            <DashboardLayout>
-              <WorkOrder />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <WorkOrder />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
 
-        {/* Clients Page */}
         <Route
           path="/clients"
           element={
-            <DashboardLayout>
-              <Clients />
-            </DashboardLayout>
+            <ProtectedRoute allowedRoles="ADMIN">
+              <DashboardLayout>
+                <Clients />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
 
@@ -65,16 +83,29 @@ export default function App() {
         <Route
           path="/clients/:id"
           element={
-            <DashboardLayout>
-              <ClientProfile />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ClientProfile />
+              </DashboardLayout>
+            </ProtectedRoute>
           }
         />
-        
+
+        {/* Vehicle Details */}
+        <Route
+          path="/vehicle/:id"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <VehicleDetails />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Error Pages - Standalone (no layout) */}
         <Route path="/error/401" element={<Error401 />} />
         <Route path="/error/500" element={<Error500 />} />
-
       </Routes>
     </BrowserRouter>
   );

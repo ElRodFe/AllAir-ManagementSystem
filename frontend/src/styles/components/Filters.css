@@ -13,19 +13,6 @@
   gap: 0.5rem;
 }
 
-.label {
-  display: block;
-  font-weight: 600;
-}
-
-select {
-  padding: 8px 10px;
-  height: 30px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: none;
-}
-
 .sort-toggle {
   padding: 8px 12px;
   height: 30px;

@@ -1,24 +1,32 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from "react";
 import Header from "../components/Header";
-import SearchBar from '../components/SearchBar';
-import Filters from '../components/Filters';
-import Pagination from '../components/Paginations';
-import OrdersTable from '../components/OrdersTable';
-import useDebounce from '../utils/useDebounce';
+import SearchBar from "../components/SearchBar";
+import Filters from "../components/Filters";
+import Pagination from "../components/Paginations";
+import OrdersTable from "../components/OrdersTable";
+import Modal from "../components/Modal";
+import WorkOrderForm from "../components/WorkOrderForm";
+import useDebounce from "../utils/useDebounce";
 
-// Mock data
-import sampleData from '../data/sampleOrders.json';
-import customers from '../data/sampleCustomers.json';
+import {
+  getWorkOrders,
+  createWorkOrder,
+  updateWorkOrder,
+  deleteWorkOrder,
+} from "../services/workOrderService";
+import { getClients } from "../services/clientService";
+import { getVehicles } from "../services/vehicleService";
 
 function uniqueValues(items, key) {
-  return Array.from(new Set(items.map(i => i[key]).filter(Boolean))).sort();
+  return Array.from(new Set(items.map((i) => i[key]).filter(Boolean))).sort();
 }
 
 export default function WorkOrders() {
-  const navigate = useNavigate();
   const [rawData, setRawData] = useState([]);
-  const [search, setSearch] = useState('');
+  const [clients, setClients] = useState([]);
+  const [vehicles, setVehicles] = useState([]);
+
+  const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
   const [filters, setFilters] = useState({
@@ -27,60 +35,122 @@ export default function WorkOrders() {
     order: "asc",
   });
 
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Modals
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingOrder, setEditingOrder] = useState(null);
+
+  // Pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Load Order Data
-  useEffect(() => {
-    async function load() {
-      try {
-        // Replace with actual data fetching logic
-        setRawData(sampleData);
-      } catch (e) {
-        setRawData(sampleData);
-      }
+  // Load everything
+  const loadData = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const [ordersData, clientsData, vehiclesData] = await Promise.all([
+        getWorkOrders(),
+        getClients(),
+        getVehicles(),
+      ]);
+
+      setRawData(ordersData || []);
+      setClients(clientsData || []);
+      setVehicles(vehiclesData || []);
+    } catch (err) {
+      console.error(err);
+      setError(err.message || "Failed to load data");
+    } finally {
+      setLoading(false);
     }
-    load();
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
-  // Joined Tables (Mock Data)
-  const ordersWithCustomerInfo = useMemo(() => {
-    return rawData.map(order => {
-      const cust = customers.find(c => c.id === order.client_id);
+  // Handle CRUD
+  const handleCreate = async (formData) => {
+    try {
+      await createWorkOrder(formData);
+      await loadData();
+      setShowAddModal(false);
+      alert("Work order created successfully");
+    } catch (err) {
+      alert("Failed to create work order: " + err.message);
+    }
+  };
 
+  const handleEdit = async (id, formData) => {
+    try {
+      await updateWorkOrder(id, formData);
+      await loadData();
+      setEditModalOpen(false);
+      setEditingOrder(null);
+      alert("Work order updated");
+    } catch (err) {
+      alert("Failed to update: " + err.message);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this work order?")) return;
+    try {
+      await deleteWorkOrder(id);
+      await loadData();
+    } catch (err) {
+      alert("Failed to delete: " + err.message);
+    }
+  };
+
+  // Join data: clients + vehicles
+  const joinedOrders = useMemo(() => {
+    return rawData.map((o) => {
+      const client = clients.find((c) => c.id === o.client_id);
+      const vehicle = vehicles.find((v) => v.id === o.vehicle_id);
       return {
-        ...order,
-        customer_name: cust ? cust.name : "Unknown",
-        customer_phone: cust ? cust.phone : "N/A",
-        customer_email: cust ? cust.email : "N/A"
+        ...o,
+        customer_name: client?.name || "Unknown",
+        customer_phone: client?.phone_number || "N/A",
+        customer_email: client?.email || "N/A",
+        vehicle_plate: vehicle?.plate_number || "N/A",
+        vehicle_model: vehicle?.brand_model || "N/A",
+        vehicle_type: vehicle?.vehicle_type || "N/A",
       };
     });
-  }, [rawData]);
+  }, [rawData, clients, vehicles]);
 
+  // Filters
   const payment_status = useMemo(() => uniqueValues(rawData, "payment_status"), [rawData]);
   const work_status = useMemo(() => uniqueValues(rawData, "work_status"), [rawData]);
 
-  // Search Filter and Sorting
+  // Full filtering + search + sorting
   const filtered = useMemo(() => {
-    let items = [...ordersWithCustomerInfo]; 
+    let items = [...joinedOrders];
 
     // Search
     if (debouncedSearch) {
       const s = debouncedSearch.toLowerCase();
-      items = items.filter(it =>
-        `${it.id}`.toLowerCase().includes(s) ||
-        (it.customer_name || '').toLowerCase().includes(s) ||
-        (it.details || '').toLowerCase().includes(s) ||
-        (it.spare_parts || '').toLowerCase().includes(s)
+      items = items.filter(
+        (it) =>
+          `${it.id}`.includes(s) ||
+          it.customer_name.toLowerCase().includes(s) ||
+          (it.details || "").toLowerCase().includes(s) ||
+          (it.vehicle_plate || "").toLowerCase().includes(s)
       );
     }
 
-    // Filter
-    if (filters.payment_status)
-      items = items.filter(i => i.payment_status === filters.payment_status);
-
-    if (filters.work_status)
-      items = items.filter(i => i.work_status === filters.work_status);
+    // Filters
+    if (filters.payment_status) {
+      items = items.filter((i) => i.payment_status === filters.payment_status);
+    }
+    if (filters.work_status) {
+      items = items.filter((i) => i.work_status === filters.work_status);
+    }
 
     // Sorting
     items.sort((a, b) => {
@@ -90,55 +160,88 @@ export default function WorkOrders() {
     });
 
     return items;
-  }, [ordersWithCustomerInfo, filters, debouncedSearch]);
+  }, [joinedOrders, filters, debouncedSearch]);
 
   // Pagination
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
-
   useEffect(() => {
     if (page > totalPages) setPage(1);
-  }, [totalPages]);
+  }, [filtered.length, pageSize]);
 
   const pageItems = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filtered.slice(start, start + pageSize);
   }, [filtered, page, pageSize]);
 
+  // Loading state
+  if (loading) {
+    return <div className="loading">Loading work orders…</div>;
+  }
+
   return (
     <>
-      <Header icon_url="assets/order.svg" title="Work Orders" username="John Doe" />
+      {/* Create modal */}
+      <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="New Work Order">
+        <WorkOrderForm
+          clients={clients}
+          vehicles={vehicles}
+          onSubmit={handleCreate}
+          onCancel={() => setShowAddModal(false)}
+        />
+      </Modal>
 
-      <div className="work-orders-page">
-        <div className="page-header">
-          <h2 className="font-title">All Work Orders</h2>
-          <button className="btn-primary" onClick={() => navigate('/work-orders/create')}>
-            Create New Order
-          </button>
-        </div>
+      {/* Edit modal */}
+      <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)} title="Edit Work Order">
+        {editingOrder && (
+          <WorkOrderForm
+            clients={clients}
+            vehicles={vehicles}
+            initialData={editingOrder}
+            onSubmit={(data) => handleEdit(editingOrder.id, data)}
+            onCancel={() => setEditModalOpen(false)}
+          />
+        )}
+      </Modal>
 
+      <Header icon_url="assets/order.svg" title="Work Orders" />
+
+      <div className="dashboard">
         <div className="app-shell">
+          <div className="page-header">
+            <h2 className="font-subtitle margin-bottom-md">Order List</h2>
+
+            <button className="btn add-btn" onClick={() => setShowAddModal(true)}>
+              + New Order
+            </button>
+          </div>
+
           <div className="controls between">
             <Filters
               payment_status={payment_status}
               work_status={work_status}
               selected={filters}
-              onChange={(newFilters) => {
-                setFilters(newFilters);
+              onChange={(f) => {
+                setFilters(f);
                 setPage(1);
               }}
             />
 
-            <div className="search-bar-wrapper">
-              <SearchBar value={search} onChange={setSearch} />
-            </div>
+            <SearchBar value={search} onChange={setSearch} />
           </div>
 
-          <OrdersTable items={pageItems} />
+          <OrdersTable
+            items={pageItems}
+            onEdit={(order) => {
+              setEditingOrder(order);
+              setEditModalOpen(true);
+            }}
+            onDelete={handleDelete}
+          />
 
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={(p) => setPage(Math.max(1, Math.min(totalPages, p)))}
+            onPageChange={(p) => setPage(p)}
             pageSize={pageSize}
             onPageSizeChange={(s) => {
               setPageSize(s);

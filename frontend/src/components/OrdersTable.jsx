@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/components/OrdersTable.css";
+import "../styles/components/Table.css";
 import { normalize } from "../utils/util";
 
 export default function OrdersTable({ items, onEdit, onDelete }) {
@@ -12,7 +12,7 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
 
   return (
     <div className="table-wrap">
-      <table className="orders-table" role="table" aria-label="Work orders">
+      <table className="table" role="table" aria-label="Work orders">
         <thead>
           <tr>
             <th className="col-id">ID</th>
@@ -21,23 +21,26 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
             <th>Work Status</th>
             <th>Payment Status</th>
             <th>Entry Date</th>
+            <th>Actions</th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
 
         <tbody>
           {items.length === 0 ? (
             <tr className="no-results">
-              <td colSpan="6">No results</td>
+              <td colSpan="9">No results</td>
             </tr>
           ) : (
             items.map((it) => (
-              <tr 
-                key={it.id} 
-                className="orders-row" 
+              <tr
+                key={it.id}
+                className="row"
                 onClick={() => handleRowClick(it.id)}
-                style={{ cursor: 'pointer' }}
+                style={{ cursor: "pointer" }}
               >
-                <td className="order-id col-id">#{it.id}</td>
+                <td className="id col-id">#{it.id}</td>
 
                 <td>{it.customer_name || "—"}</td>
 
@@ -55,11 +58,7 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
                   </span>
                 </td>
 
-                <td>
-                  {it.entry_date
-                    ? new Date(it.entry_date).toLocaleDateString()
-                    : "—"}
-                </td>
+                <td>{it.entry_date ? new Date(it.entry_date).toLocaleDateString() : "—"}</td>
                 <td>
                   <button
                     onClick={(e) => {

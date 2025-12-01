@@ -1,0 +1,21 @@
+.login-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100vh;
+  width: 100%;
+}
+
+.login-left {
+  background: linear-gradient(135deg, #88d4ca, #059e59);
+}
+
+.login-logo {
+  position: absolute;
+  width: 350px;
+  left: var(--space-8);
+  bottom: var(--space-8);
+}
+
+.login-content {
+  width: 360px;
+}

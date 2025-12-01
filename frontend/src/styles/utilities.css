@@ -1,13 +1,30 @@
 /* Layout helpers */
-.flex { display: flex; }
-.center { display: flex; justify-content: center; align-items: center; }
-.between { display: flex; justify-content: space-between; align-items: center; }
-.column { display: flex; flex-direction: column; align-items: center;}
-
+.flex {
+  display: flex;
+}
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 /* Text helpers */
-.text-muted { color: var(--text-muted); }
-.text-lg { font-size: var(--fs-body-lg); }
+.text-muted {
+  color: var(--text-muted);
+}
+.text-lg {
+  font-size: var(--fs-body-lg);
+}
 
 .font-hero {
   font-size: var(--fs-hero);
@@ -53,13 +70,18 @@
 
 /* Button */
 .btn {
+  background-color: var(--color-green-500);
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-weight: 500;
-  border: none;
+  font-weight: 600;
+  color: var(--color-green-100);
 }
-.btn-primary {
-  background-color: var(--color-brand-400);
-  color: white;
+
+.btn:hover {
+  background-color: var(--color-green-600);
+}
+
+.controls {
+  position: relative;
 }
