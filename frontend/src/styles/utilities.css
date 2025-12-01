@@ -81,3 +81,7 @@
 .btn:hover {
   background-color: var(--color-green-600);
 }
+
+.controls {
+  position: relative;
+}

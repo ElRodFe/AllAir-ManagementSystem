@@ -1,13 +1,17 @@
-import React, { useEffect } from 'react';
-import '../styles/pages/ErrorPage.css';
+import React, { useEffect } from "react";
+import "../styles/pages/ErrorPage.css";
 
 export default function Error401() {
   useEffect(() => {
-    document.title = 'AllAir | 401 Unauthentication Error';
+    document.title = "AllAir | 401 Unauthentication Error";
   }, []);
 
   const handleLogin = () => {
-    window.location.href = '/';
+    window.location.href = "/";
+  };
+
+  const handleGoHome = () => {
+    window.location.href = "/";
   };
 
   return (
@@ -17,15 +21,18 @@ export default function Error401() {
           <img src="/assets/allair_logo.svg" alt="AllAir Logo" className="error-logo" />
         </div>
       </header>
-      
+
       <div className="error-container-minimal">
         <div className="error-image-large">
           <img src="/assets/error-401.png" alt="Unauthorized Access" />
         </div>
-        
+
         <div className="error-actions">
-          <button className="btn-primary" onClick={handleLogin}>
-            Go to Login
+          <button className="btn-primary" onClick={handleGoHome}>
+            Go to Homepage
+          </button>
+          <button className="btn-secondary" onClick={handleLogin}>
+            Login
           </button>
         </div>
       </div>

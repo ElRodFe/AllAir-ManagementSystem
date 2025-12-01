@@ -119,3 +119,33 @@ input {
   padding-left: var(--space-4);
   font-size: var(--fs-body);
 }
+
+.add-btn {
+  position: absolute;
+  width: 142px;
+  height: 40px;
+  right: var(--space-3);
+  top: var(--space-3);
+}
+
+.label {
+  display: block;
+  font-weight: 600;
+}
+
+select {
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: none;
+  font-size: var(--fs-body);
+}
+
+textarea {
+  resize: none;
+}
+
+.grid-header {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+}

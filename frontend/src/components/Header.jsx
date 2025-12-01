@@ -1,13 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "../styles/components/Header.css";
 
-export default function Header({ icon_url, title}) {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
+export default function Header({ icon_url, title }) {
+  const [user] = useState(() => {
     const stored = localStorage.getItem("user");
-    if (stored) setUser(JSON.parse(stored));
-  }, []);
+    return stored ? JSON.parse(stored) : null;
+  });
 
   return (
     <header>
@@ -17,7 +15,7 @@ export default function Header({ icon_url, title}) {
           <h1>{title}</h1>
         </div>
         <div className="header-user column">
-          <img src="assets/user_icon.svg" alt="User Profile" />
+          <img src="/assets/user_icon.svg" alt="User Profile" />
           <p className="font-body">{user ? user.username || user.name : "Loading..."}</p>
         </div>
       </div>

@@ -1,16 +1,16 @@
 .table-wrap {
   overflow-x: auto;
-  margin-top: 16px;
+  margin-top: var(--space-4);
   border-top: 1px solid transparent;
 }
 
-.orders-table {
+.table {
   width: 100%;
   border-collapse: collapse;
   min-width: 800px;
 }
 
-.orders-table thead th {
+.table thead th {
   background: var(--color-green-400);
   padding: 14px 16px;
   text-align: left;
@@ -18,7 +18,7 @@
   font-weight: 600;
 }
 
-.orders-table tbody td {
+.table tbody td {
   padding: 18px 16px;
   border-bottom: 1px solid var(--color-green-600);
   vertical-align: middle;
@@ -30,26 +30,26 @@
   white-space: nowrap;
 }
 
-.order-id {
+.id {
   font-weight: 600;
   color: var(--color-blue-600);
 }
 
-.orders-row:hover {
+.row:hover {
   background: var(--gray-0);
 }
 
 .no-results td {
   text-align: center;
-  padding: 24px;
-  font-size: 15px;
+  padding: var(--space-6);
+  font-size: var(--fs-body-lg);
   color: var(--text-muted);
 }
 
 .badge {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;

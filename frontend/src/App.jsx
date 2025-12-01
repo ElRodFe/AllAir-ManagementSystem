@@ -11,32 +11,32 @@ import Error401 from "./pages/Error401";
 import Error500 from "./pages/Error500";
 import Clients from "./pages/Clients";
 import ClientProfile from "./pages/ClientProfile";
+import VehicleDetails from "./pages/VehicleDetails";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        <Route 
-        path="/" 
-        element={
-          <LoginLayout>
-            <Login />
-          </LoginLayout>
-          } 
+        <Route
+          path="/"
+          element={
+            <LoginLayout>
+              <Login />
+            </LoginLayout>
+          }
         />
 
         <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout>
-              <Dashboard />
-            </DashboardLayout>
-          </ProtectedRoute>
-        }
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Dashboard />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
         />
-        
+
         <Route
           path="/work-orders"
           element={
@@ -47,7 +47,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/work-orders/create"
           element={
@@ -56,7 +56,7 @@ export default function App() {
             </DashboardLayout>
           }
         />
-        
+
         <Route
           path="/work-order/:id"
           element={
@@ -71,7 +71,7 @@ export default function App() {
         <Route
           path="/clients"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles="ADMIN">
               <DashboardLayout>
                 <Clients />
               </DashboardLayout>
@@ -90,11 +90,22 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        
+
+        {/* Vehicle Details */}
+        <Route
+          path="/vehicle/:id"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <VehicleDetails />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Error Pages - Standalone (no layout) */}
         <Route path="/error/401" element={<Error401 />} />
         <Route path="/error/500" element={<Error500 />} />
-
       </Routes>
     </BrowserRouter>
   );

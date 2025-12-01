@@ -37,8 +37,7 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
 
         return api(originalRequest);
-
-      } catch (refreshError) {
+      } catch {
         // Refresh failed and Log out
         localStorage.clear();
         window.location.href = "/";
