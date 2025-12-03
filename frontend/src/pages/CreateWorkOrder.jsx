@@ -1,42 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 
 // Mock data
-import customers from '../data/sampleCustomers.json';
+import customers from "../data/sampleCustomers.json";
 
 export default function CreateWorkOrder() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    entry_date: new Date().toISOString().split('T')[0],
-    egress_date: '',
-    client_id: '',
-    vehicle_id: '',
-    work_status: 'pending',
-    payment_status: 'not_paid',
-    refrigerant_gas_retrieved: '',
-    refrigerant_gas_injected: '',
-    oil_retrieved: '',
-    oil_injected: '',
+    entry_date: new Date().toISOString().split("T")[0],
+    egress_date: "",
+    client_id: "",
+    vehicle_id: "",
+    work_status: "pending",
+    payment_status: "not_paid",
+    refrigerant_gas_retrieved: "",
+    refrigerant_gas_injected: "",
+    oil_retrieved: "",
+    oil_injected: "",
     detector: false,
-    spare_parts: '',
-    details: '',
-    workers: '',
-    hours: ''
+    spare_parts: "",
+    details: "",
+    workers: "",
+    hours: "",
   });
 
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
 
@@ -44,24 +44,24 @@ export default function CreateWorkOrder() {
     const newErrors = {};
 
     if (!formData.entry_date) {
-      newErrors.entry_date = 'Entry date is required';
+      newErrors.entry_date = "Entry date is required";
     }
 
     if (!formData.client_id) {
-      newErrors.client_id = 'Client is required';
+      newErrors.client_id = "Client is required";
     }
 
     if (!formData.vehicle_id) {
-      newErrors.vehicle_id = 'Vehicle ID is required';
+      newErrors.vehicle_id = "Vehicle ID is required";
     }
 
     if (!formData.workers) {
-      newErrors.workers = 'Workers field is required';
+      newErrors.workers = "Workers field is required";
     }
 
     if (formData.egress_date && formData.entry_date) {
       if (new Date(formData.egress_date) < new Date(formData.entry_date)) {
-        newErrors.egress_date = 'Egress date cannot be before entry date';
+        newErrors.egress_date = "Egress date cannot be before entry date";
       }
     }
 
@@ -71,27 +71,27 @@ export default function CreateWorkOrder() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     // Here you would normally send the data to your API
-    console.log('Form submitted:', formData);
-    
+    console.log("Form submitted:", formData);
+
     // For now, just navigate back to work orders list
-    alert('Work order created successfully!');
-    navigate('/work-orders');
+    alert("Work order created successfully!");
+    navigate("/work-orders");
   };
 
   const handleCancel = () => {
-    navigate('/work-orders');
+    navigate("/work-orders");
   };
 
   return (
     <>
-      <Header icon_url="assets/order.svg" title="Create Work Order" username="John Doe" />
-      
+      <Header icon_url="/assets/order.svg" title="Create Work Order" username="John Doe" />
+
       <div className="create-work-order-page">
         <div className="page-header">
           <h2>Create New Work Order</h2>
@@ -173,7 +173,7 @@ export default function CreateWorkOrder() {
                   required
                 >
                   <option value="">Select a client</option>
-                  {customers.map(customer => (
+                  {customers.map((customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.name} - {customer.phone}
                     </option>

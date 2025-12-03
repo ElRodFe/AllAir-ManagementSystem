@@ -1,13 +1,21 @@
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+
 import Header from "../components/Header";
-import "../styles/pages/ClientProfile.css";
-import { getClientById, getClientVehicles, addVehicle, deleteVehicle } from "../utils/api";
+import SearchBar from "../components/SearchBar";
+import DetailsLayout from "../components/DetailsLayout";
+import DetailsSection from "../components/DetailsSection";
+import DetailsInfoItem from "../components/DetailsInfoItem";
+import VehiclesTable from "../components/VehiclesTable";
+import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
+import useDebounce from "../utils/useDebounce";
+
+import { getClientById } from "../services/clientService";
+import { getVehicles, deleteVehicle } from "../services/vehicleService";
 
 export default function ClientProfile() {
   const { id } = useParams();
-  const clientId = Number(id);
 
   const [client, setClient] = useState(null);
   const [vehicles, setVehicles] = useState([]);
@@ -19,146 +27,156 @@ export default function ClientProfile() {
     plate_number: "",
   });
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        const c = await getClientById(clientId);
-        setClient(c);
+  // search
+  const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 300);
 
-        const v = await getClientVehicles(clientId);
-        setVehicles(v);
-      } catch (err) {
-        console.error(err);
+  // pagination
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
+
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true);
+        const c = await getClientById(id);
+        const allVehicles = await getVehicles();
+        const owned = allVehicles.filter((v) => v.owner_id === Number(id));
+
+        setClient(c);
+        setVehicles(owned);
+      } finally {
+        setLoading(false);
       }
     }
+    load();
+  }, [id]);
 
-    loadData();
-  }, [clientId]);
+  // SEARCH FILTER
+  const filteredVehicles = useMemo(() => {
+    if (!debouncedSearch) return vehicles;
 
-  const openAddVehicleModal = () => setShowAddVehicleModal(true);
-  const closeAddVehicleModal = () => setShowAddVehicleModal(false);
+    const s = debouncedSearch.toLowerCase();
 
-  const handleAddVehicle = async (e) => {
-    e.preventDefault();
-    try {
-      const form = e.target;
-      const vehicleData = {
-        vehicle_type: form.vehicle_type.value,
-        brand_model: form.brand_model.value,
-        kilometers: Number(form.kilometers.value),
-        plate_number: form.plate_number.value,
-        owner_id: clientId
-      };
-      const added = await addVehicle(clientId, vehicleData);
-      setVehicles(prev => [...prev, added]);
-      closeAddVehicleModal();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add vehicle: " + err.message);
-    }
+    return vehicles.filter((v) => {
+      return (
+        `${v.id}`.includes(s) ||
+        (v.vehicle_type || "").toLowerCase().includes(s) ||
+        (v.brand_model || "").toLowerCase().includes(s) ||
+        (v.plate_number || "").toLowerCase().includes(s) ||
+        `${v.kilometers || ""}`.toLowerCase().includes(s)
+      );
+    });
+  }, [vehicles, debouncedSearch]);
+
+  // PAGINATION
+  const totalPages = Math.max(1, Math.ceil(filteredVehicles.length / pageSize));
+
+  useEffect(() => {
+    if (page > totalPages) setPage(1);
+  }, [totalPages]);
+
+  const pagedVehicles = useMemo(() => {
+    const start = (page - 1) * pageSize;
+    return filteredVehicles.slice(start, start + pageSize);
+  }, [filteredVehicles, page, pageSize]);
+
+  // table actions
+  const handleEditVehicle = (vehicle) => {
+    setEditingVehicle(vehicle);
+    setShowEditModal(true);
   };
 
   const handleDeleteVehicle = async (vehicleId) => {
-    if (!confirm("Are you sure you want to delete this vehicle?")) return;
+    if (!window.confirm("Are you sure you want to delete this vehicle?")) return;
 
     try {
-      await deleteVehicle(clientId, vehicleId);
-
-      setVehicles((prev) => prev.filter(v => v.id !== vehicleId));
-
+      await deleteVehicle(vehicleId);
+      setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
+      alert("Vehicle deleted");
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete vehicle: " + err.message);
+      alert("Error deleting vehicle");
     }
   };
 
-  if (!client) return <p>Loading...</p>;
-
   return (
     <>
-      <Header 
-        icon_url="assets/user.svg" 
-        title={`Client: ${client.name}`} 
-        username="John Doe" 
-      />
-
-      <div className="client-profile-page">
-
-        {/* Client Info */}
-        <div className="card client-info-card">
-          <h2 className="font-title margin-bottom-md">Client Information</h2>
-
-          <p><strong>Name:</strong> {client.name}</p>
-          <p><strong>Phone:</strong> {client.phone_number}</p>
-          <p><strong>Email:</strong> {client.email || "Not provided"}</p>
+      {/* Modal */}
+      <Modal
+        open={showEditModal}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingVehicle(null);
+        }}
+        title={editingVehicle ? "Edit Vehicle" : "Add Vehicle"}
+      >
+        <div>
+          <p>{editingVehicle ? "Edit Vehicle Form Goes Here" : "New Vehicle Form Goes Here"}</p>
         </div>
+      </Modal>
 
-        {/* Vehicles */}
-        <div className="card vehicles-card">
-          <h2 className="font-title margin-bottom-md">Vehicles</h2>
+      <Header icon_url="/assets/user.svg" title="Client Details" />
 
-          {vehicles.length === 0 ? (
-            <p>No vehicles registered.</p>
-          ) : (
-            <table className="vehicles-table">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Brand/Model</th>
-                  <th>Kilometers</th>
-                  <th>Plate</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+      <DetailsLayout title={client ? `Client #${client.id}` : "Client Details"}>
+        {loading || !client ? (
+          <p>Loading client...</p>
+        ) : (
+          <>
+            <DetailsSection title="Information">
+              <DetailsInfoItem label="Full Name" value={client.name} full />
+              <DetailsInfoItem label="Phone Number" value={client.phone_number} />
+              <DetailsInfoItem label="Email Address" value={client.email} />
+            </DetailsSection>
 
-              <tbody>
-                {vehicles.map((v) => (
-                  <tr key={v.id}>
-                    <td>{v.vehicle_type}</td>
-                    <td>{v.brand_model}</td>
-                    <td>{v.kilometers}</td>
-                    <td>{v.plate_number}</td>
-                    <td>
-                      <button 
-                        className="delete-btn"
-                        onClick={() => handleDeleteVehicle(v.id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+            {/* VEHICLES */}
+            <DetailsSection title="Vehicles Owned">
+              <div className="details-info-item full">
+                <div className="between margin-bottom-md controls">
+                  <button
+                    className="btn add-btn"
+                    onClick={() => {
+                      setEditingVehicle(null); // create mode
+                      setShowEditModal(true);
+                    }}
+                  >
+                    + Add Vehicle
+                  </button>
 
-          <Modal open={showAddVehicleModal} onClose={closeAddVehicleModal} title="Add Vehicle">
-            <form className="modal-form" onSubmit={handleAddVehicle}>
-              <label>
-                Type:
-                <input name="vehicle_type" required />
-              </label>
-              <label>
-                Brand/Model:
-                <input name="brand_model" required />
-              </label>
-              <label>
-                Kilometers:
-                <input type="number" name="kilometers" required />
-              </label>
-              <label>
-                Plate:
-                <input name="plate_number" required />
-              </label>
-              <div className="modal-actions">
-                <button type="button" onClick={closeAddVehicleModal}>Cancel</button>
-                <button type="submit">Add Vehicle</button>
+                  <div className="search-bar-wrapper">
+                    <SearchBar
+                      value={search}
+                      onChange={setSearch}
+                      placeholder="Search vehicles..."
+                    />
+                  </div>
+                </div>
+                <VehiclesTable
+                  items={pagedVehicles}
+                  onView={(v) => (window.location.href = `/vehicle/${v.id}`)}
+                  onEdit={handleEditVehicle}
+                  onDelete={handleDeleteVehicle}
+                />
               </div>
-            </form>
-          </Modal>
-            <button onClick={openAddVehicleModal}>+ Add Vehicle</button>
-        </div>
-      </div>
+
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={(p) => setPage(Math.max(1, Math.min(totalPages, p)))}
+                pageSize={pageSize}
+                onPageSizeChange={(size) => {
+                  setPageSize(size);
+                  setPage(1);
+                }}
+              />
+            </DetailsSection>
+          </>
+        )}
+      </DetailsLayout>
     </>
   );
 }
