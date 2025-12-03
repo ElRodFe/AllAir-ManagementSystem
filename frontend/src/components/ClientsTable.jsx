@@ -47,7 +47,7 @@ export default function ClientsTable({ items, onView, onEdit, onDelete }) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        onView(c);
+                        onView(c.id);
                       }}
                     >
                       Details
