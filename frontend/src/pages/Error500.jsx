@@ -6,11 +6,7 @@ export default function Error500() {
     document.title = 'AllAir | 500 Internal Server Error';
   }, []);
 
-  const handleGoBack = () => {
-    window.history.back();
-  };
-
-  const handleGoHome = () => {
+  const handleLogin = () => {
     window.location.href = '/';
   };
 
@@ -28,11 +24,8 @@ export default function Error500() {
         </div>
         
         <div className="error-actions">
-          <button className="btn-primary" onClick={handleGoHome}>
-            Go to Homepage
-          </button>
-          <button className="btn-secondary" onClick={handleGoBack}>
-            Go Back
+          <button className="btn-primary" onClick={handleLogin}>
+            Login
           </button>
         </div>
       </div>

@@ -6,9 +6,11 @@ import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
 import Filters from "../components/Filters";
 import Pagination from "../components/Paginations";
+import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
 import Modal from "../components/Modal";
 import WorkOrderForm from "../components/WorkOrderForm";
+import { useToast } from "../utils/useToast";
 import {
   getWorkOrders,
   createWorkOrder,
@@ -23,6 +25,7 @@ function uniqueValues(items, key) {
 }
 
 export default function Dashboard() {
+  const toast = useToast();
   const [user, setUser] = useState(null);
   const [rawData, setRawData] = useState([]);
   const [clients, setClients] = useState([]);
@@ -77,10 +80,10 @@ export default function Dashboard() {
       await createWorkOrder(formData);
       await loadData();
       setShowAddModal(false);
-      alert("Work order created");
+      toast.success("Work order created successfully");
     } catch (err) {
       console.error("Error creating work order:", err);
-      alert("Error creating order: " + (err.message || err));
+      toast.error("Error creating order: " + (err.message || err));
     }
   };
 
@@ -90,10 +93,10 @@ export default function Dashboard() {
       await loadData();
       setEditModalOpen(false);
       setEditingOrder(null);
-      alert("Work order updated");
+      toast.success("Work order updated successfully");
     } catch (err) {
       console.error("Error editing work order:", err);
-      alert("Error editing order: " + (err.message || err));
+      toast.error("Error editing order: " + (err.message || err));
     }
   };
 
@@ -112,10 +115,10 @@ export default function Dashboard() {
     try {
       await deleteWorkOrder(id);
       setRawData((prev) => prev.filter((o) => o.id !== id));
-      alert("Work order deleted successfully!");
+      toast.success("Work order deleted successfully");
     } catch (err) {
       console.error("Error deleting work order:", err);
-      alert("Error deleting work order: " + (err.message || err));
+      toast.error("Error deleting work order: " + (err.message || err));
     }
   };
 
@@ -184,20 +187,16 @@ export default function Dashboard() {
   const stats = useMemo(() => {
     return {
       total: rawData.length,
-      new: rawData.filter((order) => order.work_status === "PENDING").length,
-      completed: rawData.filter((order) => order.work_status === "COMPLETED").length,
+      new: rawData.filter((order) => order.work_status === "pending").length,
+      completed: rawData.filter((order) => order.work_status === "completed").length,
       pending: rawData.filter(
-        (order) => order.payment_status === "PENDING" || order.work_status === "IN_PROGRESS"
+        (order) => order.payment_status === "NOT_PAID" || order.payment_status === "BILL_SENT"
       ).length,
     };
   }, [rawData]);
 
   if (loading) {
-    return (
-      <div className="dashboard">
-        <div className="loading">Loading data...</div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading dashboard..." fullPage />;
   }
 
   return (

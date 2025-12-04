@@ -1,10 +1,21 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import "../styles/components/Sidebar.css";
 import { logout } from "../services/authService";
 
 export default function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [userRole, setUserRole] = useState(null);
+
+  useEffect(() => {
+    // Get user role from localStorage
+    const user = localStorage.getItem("user");
+    if (user) {
+      const userData = JSON.parse(user);
+      setUserRole(userData.role);
+    }
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -28,12 +39,15 @@ export default function Sidebar() {
             </Link>
           </div>
 
-          <div className={`nav-item margin-bottom-lg ${isActive("/clients") ? "active" : ""}`}>
-            <Link className="nav-link" to="/clients">
-              <img src="/assets/client_tumb.svg" alt="Clients" />
-              <span>Clients</span>
-            </Link>
-          </div>
+          {/* Only show Clients menu for ADMIN users */}
+          {userRole === "ADMIN" && (
+            <div className={`nav-item margin-bottom-lg ${isActive("/clients") ? "active" : ""}`}>
+              <Link className="nav-link" to="/clients">
+                <img src="/assets/client_tumb.svg" alt="Clients" />
+                <span>Clients</span>
+              </Link>
+            </div>
+          )}
 
           <div className={`nav-item margin-bottom-lg ${isActive("/work-orders") ? "active" : ""}`}>
             <Link className="nav-link" to="/work-orders">

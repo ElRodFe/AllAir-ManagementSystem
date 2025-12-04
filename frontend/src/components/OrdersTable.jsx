@@ -61,6 +61,7 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
                 <td>{it.entry_date ? new Date(it.entry_date).toLocaleDateString() : "—"}</td>
                 <td>
                   <button
+                    className="btn-details"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/work-order/${it.id}`);
@@ -71,6 +72,7 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
                 </td>
                 <td>
                   <button
+                    className="btn-edit"
                     onClick={(e) => {
                       e.stopPropagation();
                       onEdit(it);
@@ -81,6 +83,7 @@ export default function OrdersTable({ items, onEdit, onDelete }) {
                 </td>
                 <td>
                   <button
+                    className="btn-delete"
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(it.id);
