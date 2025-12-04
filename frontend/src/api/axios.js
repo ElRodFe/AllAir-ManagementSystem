@@ -1,4 +1,5 @@
 import axios from "axios";
+import { pushAxiosNotification } from "../contexts/axiosNotify";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -15,16 +16,18 @@ api.interceptors.request.use((config) => {
 // Response interceptor for refresh logic
 api.interceptors.response.use(
   (response) => response,
+
   async (error) => {
+    pushAxiosNotification(error);
+
     const originalRequest = error.config;
 
     // If unauthorized, try refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      const refreshToken = localStorage.getItem("refresh_token");
-
       try {
+        const refreshToken = localStorage.getItem("refresh_token");
         const res = await api.post("/auth/refresh", {
           refresh_token: refreshToken,
         });
