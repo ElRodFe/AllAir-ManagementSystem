@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, saveAuthData } from "../services/authService";
+import { useNotify } from "../contexts/NotificationContext";
 import "../styles/pages/Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { pushNotification } = useNotify();
 
   const [formData, setFormData] = useState({
     username: "",
@@ -12,7 +14,6 @@ export default function Login() {
   });
 
   const [errors, setErrors] = useState({});
-  const [serverError, setServerError] = useState("");
 
   function handleChange(e) {
     setFormData({
@@ -41,19 +42,21 @@ export default function Login() {
     const validationErrors = validate();
     setErrors(validationErrors);
 
-    if (Object.keys(validationErrors).length > 0) return;
+    if (Object.keys(validationErrors).length > 0) {
+      pushNotification("Please fill all required fields.", "warning");
+      return;
+    }
 
     try {
       const data = await login(formData.username, formData.password);
 
-      // Save tokens + user info
       saveAuthData(data);
 
-      // Redirect to dashboard
-      navigate("/dashboard");
+      pushNotification("Login successful!", "success");
 
+      navigate("/dashboard");
     } catch (err) {
-      setServerError("Invalid username or password");
+      console.log(err);
     }
   }
 
@@ -62,10 +65,10 @@ export default function Login() {
       <h1 className="font-hero bold">Login</h1>
       <p className="margin-bottom-lg">Please log in with your credentials</p>
 
-      {serverError && <p className="server-error">{serverError}</p>}
-
       <div className="form-group">
-        <label htmlFor="username" className="font-subtitle">Username</label>
+        <label htmlFor="username" className="font-subtitle">
+          Username
+        </label>
         <input
           id="username"
           name="username"
@@ -75,13 +78,13 @@ export default function Login() {
           onChange={handleChange}
           required
         />
-        {errors.username && (
-          <span className="error-message">{errors.username}</span>
-        )}
+        {errors.username && <span className="error-msg">{errors.username}</span>}
       </div>
 
       <div className="form-group">
-        <label htmlFor="password" className="font-subtitle">Password</label>
+        <label htmlFor="password" className="font-subtitle">
+          Password
+        </label>
         <input
           id="password"
           name="password"
@@ -91,14 +94,50 @@ export default function Login() {
           onChange={handleChange}
           required
         />
-        {errors.password && (
-          <span className="error-message">{errors.password}</span>
-        )}
+        {errors.password && <span className="error-msg">{errors.password}</span>}
       </div>
 
       <button type="submit" className="login-btn btn">
         Login
       </button>
+      <div style={{ marginTop: "20px" }}>
+        <h3>Notification Test</h3>
+
+        <button
+          type="button"
+          className="btn"
+          onClick={() => pushNotification("Success test message!", "success")}
+        >
+          Test Success
+        </button>
+
+        <button
+          type="button"
+          className="btn"
+          onClick={() => pushNotification("Error test message!", "error")}
+          style={{ marginLeft: "10px" }}
+        >
+          Test Error
+        </button>
+
+        <button
+          type="button"
+          className="btn"
+          onClick={() => pushNotification("Warning test message!", "warning")}
+          style={{ marginLeft: "10px" }}
+        >
+          Test Warning
+        </button>
+
+        <button
+          type="button"
+          className="btn"
+          onClick={() => pushNotification("Info test message!", "info")}
+          style={{ marginLeft: "10px" }}
+        >
+          Test Info
+        </button>
+      </div>
     </form>
   );
 }

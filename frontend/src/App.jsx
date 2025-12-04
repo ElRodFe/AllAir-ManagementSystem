@@ -12,101 +12,104 @@ import Error500 from "./pages/Error500";
 import Clients from "./pages/Clients";
 import ClientProfile from "./pages/ClientProfile";
 import VehicleDetails from "./pages/VehicleDetails";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <LoginLayout>
-              <Login />
-            </LoginLayout>
-          }
-        />
+      <NotificationProvider>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <LoginLayout>
+                <Login />
+              </LoginLayout>
+            }
+          />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/work-orders"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <WorkOrders />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/work-orders/create"
+            element={
               <DashboardLayout>
-                <Dashboard />
+                <CreateWorkOrder />
               </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
 
-        <Route
-          path="/work-orders"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <WorkOrders />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/work-order/:id"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <WorkOrder />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/work-orders/create"
-          element={
-            <DashboardLayout>
-              <CreateWorkOrder />
-            </DashboardLayout>
-          }
-        />
+          <Route
+            path="/clients"
+            element={
+              <ProtectedRoute allowedRoles="ADMIN">
+                <DashboardLayout>
+                  <Clients />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/work-order/:id"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <WorkOrder />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+          {/* Client Profile */}
+          <Route
+            path="/clients/:id"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <ClientProfile />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/clients"
-          element={
-            <ProtectedRoute allowedRoles="ADMIN">
-              <DashboardLayout>
-                <Clients />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+          {/* Vehicle Details */}
+          <Route
+            path="/vehicle/:id"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <VehicleDetails />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* Client Profile */}
-        <Route
-          path="/clients/:id"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <ClientProfile />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Vehicle Details */}
-        <Route
-          path="/vehicle/:id"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <VehicleDetails />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Error Pages - Standalone (no layout) */}
-        <Route path="/error/401" element={<Error401 />} />
-        <Route path="/error/500" element={<Error500 />} />
-      </Routes>
+          {/* Error Pages - Standalone (no layout) */}
+          <Route path="/error/401" element={<Error401 />} />
+          <Route path="/error/500" element={<Error500 />} />
+        </Routes>
+      </NotificationProvider>
     </BrowserRouter>
   );
 }
