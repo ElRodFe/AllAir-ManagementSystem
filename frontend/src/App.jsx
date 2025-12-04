@@ -12,6 +12,7 @@ import Error500 from "./pages/Error500";
 import Clients from "./pages/Clients";
 import ClientProfile from "./pages/ClientProfile";
 import VehicleDetails from "./pages/VehicleDetails";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import { ToastProvider } from "./utils/useToast";
 import { NotificationProvider } from "./contexts/NotificationContext";
 
