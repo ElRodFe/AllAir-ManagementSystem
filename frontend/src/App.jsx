@@ -83,7 +83,7 @@ export default function App() {
         <Route
           path="/clients/:id"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedRoles="ADMIN">
               <DashboardLayout>
                 <ClientProfile />
               </DashboardLayout>

@@ -4,6 +4,7 @@ import SearchBar from "../components/SearchBar";
 import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
 import ClientsTable from "../components/ClientsTable";
+import ClientForm from "../components/ClientForm";
 import useDebounce from "../utils/useDebounce";
 
 import { getClients, deleteClient } from "../services/clientService";
@@ -116,10 +117,20 @@ export default function ClientsPage() {
         }}
         title={editingClient ? "Edit Client" : "Create New Client"}
       >
-        <div>
-          <p>{editingClient ? "Edit Client Form Goes Here" : "Create Client Form Goes Here"}</p>
-        </div>
+        <ClientForm
+          initialData={editingClient}
+          onCancel={() => {
+            setShowCreateModal(false);
+            setEditingClient(null);
+          }}
+          onSuccess={() => {
+            setShowCreateModal(false);
+            setEditingClient(null);
+            loadClients();
+          }}
+        />
       </Modal>
+
 
       <Header icon_url="/assets/user.svg" title="Clients" />
 

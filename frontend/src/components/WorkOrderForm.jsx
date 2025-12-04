@@ -1,4 +1,3 @@
-// src/components/WorkOrderForm.jsx
 import React, { useEffect, useMemo, useState } from "react";
 
 export default function WorkOrderForm({
@@ -129,9 +128,8 @@ export default function WorkOrderForm({
         Work Status:
         <select name="work_status" value={form.work_status || ""} onChange={handleChange} required>
           <option value="">Select...</option>
-          <option value="PENDING">Pending</option>
-          <option value="IN_PROGRESS">In Progress</option>
-          <option value="COMPLETED">Completed</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
         </select>
       </label>
 

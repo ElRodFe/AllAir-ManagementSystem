@@ -9,6 +9,7 @@ import DetailsInfoItem from "../components/DetailsInfoItem";
 import VehiclesTable from "../components/VehiclesTable";
 import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
+import VehicleForm from "../components/VehicleForm";
 import useDebounce from "../utils/useDebounce";
 
 import { getClientById } from "../services/clientService";
@@ -108,9 +109,18 @@ export default function ClientProfile() {
         }}
         title={editingVehicle ? "Edit Vehicle" : "Add Vehicle"}
       >
-        <div>
-          <p>{editingVehicle ? "Edit Vehicle Form Goes Here" : "New Vehicle Form Goes Here"}</p>
-        </div>
+        <VehicleForm
+          clientId={id}
+          vehicle={editingVehicle}
+          onSuccess={async () => {
+            // Reload vehicles after create/update
+            const all = await getVehicles();
+            setVehicles(all.filter(v => v.owner_id === Number(id)));
+
+            setShowEditModal(false);
+            setEditingVehicle(null);
+          }}
+        />
       </Modal>
 
       <Header icon_url="/assets/user.svg" title="Client Details" />

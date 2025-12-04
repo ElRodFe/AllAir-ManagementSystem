@@ -80,6 +80,47 @@ export async function getClientById(id) {
   return res.json();
 }
 
+export async function createClient(body) {
+  const res = await fetch(`${API_URL}/clients/`, {
+    method: "POST",
+    headers: {
+      ...authHeaders(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (res.status === 401) {
+    logout();
+    throw new Error("Authentication failed");
+  }
+
+  if (!res.ok) throw new Error("Failed to create client");
+
+  return res.json();
+}
+
+export async function updateClient(id, body) {
+  const res = await fetch(`${API_URL}/clients/${id}`, {
+    method: "PUT",
+    headers: {
+      ...authHeaders(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (res.status === 401) {
+    logout();
+    throw new Error("Authentication failed");
+  }
+
+  if (!res.ok) throw new Error("Failed to update client");
+
+  return res.json();
+}
+
+
 // ============================================
 // WORK ORDERS
 // ============================================
@@ -160,4 +201,33 @@ export async function deleteWorkOrder(id) {
   }
 
   return true;
+}
+
+// ============================================
+// VEHICLES
+// ============================================
+
+export async function getVehicles() {
+  const res = await api.get("/vehicles");
+  return res.data;
+}
+
+export async function getVehicle(id) {
+  const res = await api.get(`/vehicles/${id}`);
+  return res.data;
+}
+
+export async function createVehicle(data) {
+  const res = await api.post("/vehicles", data);
+  return res.data;
+}
+
+export async function updateVehicle(id, data) {
+  const res = await api.put(`/vehicles/${id}`, data);
+  return res.data;
+}
+
+export async function deleteVehicle(id) {
+  const res = await api.delete(`/vehicles/${id}`);
+  return res.data;
 }
