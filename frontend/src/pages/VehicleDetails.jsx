@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
@@ -10,6 +10,7 @@ import DetailsInfoItem from "../components/DetailsInfoItem";
 import OrdersTable from "../components/OrdersTable";
 import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
+import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
 
 import { getVehicleById } from "../services/vehicleService";
@@ -18,6 +19,7 @@ import { getWorkOrders } from "../services/workOrderService";
 
 export default function VehicleDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const [vehicle, setVehicle] = useState(null);
   const [owner, setOwner] = useState(null);
@@ -107,9 +109,50 @@ export default function VehicleDetails() {
 
       <Header icon_url="/assets/vehicle.svg" title="Vehicle Details" />
 
+      <div style={{ 
+        margin: '2rem 0', 
+        display: 'flex', 
+        justifyContent: 'center',
+        padding: '0 2rem'
+      }}>
+        <button 
+          className="btn-back" 
+          onClick={() => navigate(-1)}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: 'var(--color-green-400)',
+            color: 'var(--color-green-600)',
+            border: '2px solid var(--color-green-500)',
+            borderRadius: 'var(--radius-md)',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '600',
+            transition: 'all 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = 'var(--color-green-500)';
+            e.target.style.color = 'white';
+            e.target.style.transform = 'translateX(-3px)';
+            e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = 'var(--color-green-400)';
+            e.target.style.color = 'var(--color-green-600)';
+            e.target.style.transform = 'translateX(0)';
+            e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          ← Back
+        </button>
+      </div>
+
       <DetailsLayout title={vehicle ? `Vehicle #${vehicle.id}` : "Vehicle Details"}>
         {loading || !vehicle ? (
-          <p>Loading vehicle...</p>
+          <LoadingSpinner message="Loading vehicle details..." />
         ) : (
           <>
             <DetailsSection title="Information">

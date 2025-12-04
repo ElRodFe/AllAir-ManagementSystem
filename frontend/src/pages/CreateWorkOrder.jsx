@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import { useToast } from "../utils/useToast";
 
 // Mock data
 import customers from "../data/sampleCustomers.json";
 
 export default function CreateWorkOrder() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [formData, setFormData] = useState({
     entry_date: new Date().toISOString().split("T")[0],
     egress_date: "",
@@ -80,7 +82,7 @@ export default function CreateWorkOrder() {
     console.log("Form submitted:", formData);
 
     // For now, just navigate back to work orders list
-    alert("Work order created successfully!");
+    toast.success("Work order created successfully!");
     navigate("/work-orders");
   };
 

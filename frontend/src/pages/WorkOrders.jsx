@@ -6,7 +6,9 @@ import Pagination from "../components/Paginations";
 import OrdersTable from "../components/OrdersTable";
 import Modal from "../components/Modal";
 import WorkOrderForm from "../components/WorkOrderForm";
+import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
+import { useToast } from "../utils/useToast";
 
 import {
   getWorkOrders,
@@ -22,6 +24,7 @@ function uniqueValues(items, key) {
 }
 
 export default function WorkOrders() {
+  const toast = useToast();
   const [rawData, setRawData] = useState([]);
   const [clients, setClients] = useState([]);
   const [vehicles, setVehicles] = useState([]);
@@ -79,9 +82,9 @@ export default function WorkOrders() {
       await createWorkOrder(formData);
       await loadData();
       setShowAddModal(false);
-      alert("Work order created successfully");
+      toast.success("Work order created successfully");
     } catch (err) {
-      alert("Failed to create work order: " + err.message);
+      toast.error("Failed to create work order: " + err.message);
     }
   };
 
@@ -91,9 +94,9 @@ export default function WorkOrders() {
       await loadData();
       setEditModalOpen(false);
       setEditingOrder(null);
-      alert("Work order updated");
+      toast.success("Work order updated successfully");
     } catch (err) {
-      alert("Failed to update: " + err.message);
+      toast.error("Failed to update: " + err.message);
     }
   };
 
@@ -102,8 +105,9 @@ export default function WorkOrders() {
     try {
       await deleteWorkOrder(id);
       await loadData();
+      toast.success("Work order deleted successfully");
     } catch (err) {
-      alert("Failed to delete: " + err.message);
+      toast.error("Failed to delete: " + err.message);
     }
   };
 
@@ -175,7 +179,7 @@ export default function WorkOrders() {
 
   // Loading state
   if (loading) {
-    return <div className="loading">Loading work orders…</div>;
+    return <LoadingSpinner message="Loading work orders..." fullPage />;
   }
 
   return (
