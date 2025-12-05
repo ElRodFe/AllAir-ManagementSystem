@@ -8,6 +8,8 @@ import ClientForm from "../components/ClientForm";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
 import { useToast } from "../utils/useToast";
+import { useNavigate } from "react-router-dom";
+const navigate = useNavigate();
 
 import { getClients, deleteClient } from "../services/clientService";
 
@@ -47,7 +49,7 @@ export default function ClientsPage() {
   };
 
   const handleViewClient = (id) => {
-    window.location.href = `/clients/${id}`;
+    navigate(`/clients/${id}`);
   };
 
   const handleDeleteClient = async (id) => {

@@ -205,7 +205,7 @@ export default function ClientProfile() {
                 </div>
                 <VehiclesTable
                   items={pagedVehicles}
-                  onView={(v) => (window.location.href = `/vehicle/${v.id}`)}
+                  onView={(v) => navigate(`/vehicle/${v.id}`)}
                   onEdit={handleEditVehicle}
                   onDelete={handleDeleteVehicle}
                 />
