@@ -11,9 +11,12 @@ import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
 import VehicleForm from "../components/VehicleForm";
 import useDebounce from "../utils/useDebounce";
+import { useNavigate } from "react-router-dom";
 
 import { getClientById } from "../services/clientService";
 import { getVehicles, deleteVehicle } from "../services/vehicleService";
+
+const navigate = useNavigate();
 
 export default function ClientProfile() {
   const { id } = useParams();
@@ -160,7 +163,7 @@ export default function ClientProfile() {
                 </div>
                 <VehiclesTable
                   items={pagedVehicles}
-                  onView={(v) => (window.location.href = `/vehicle/${v.id}`)}
+                  onView={(v) => (navigate(`/vehicle/${v.id}`))}
                   onEdit={handleEditVehicle}
                   onDelete={handleDeleteVehicle}
                 />

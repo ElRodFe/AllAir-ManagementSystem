@@ -6,8 +6,11 @@ import Modal from "../components/Modal";
 import ClientsTable from "../components/ClientsTable";
 import ClientForm from "../components/ClientForm";
 import useDebounce from "../utils/useDebounce";
+import { useNavigate } from "react-router-dom";
 
 import { getClients, deleteClient } from "../services/clientService";
+
+const navigate = useNavigate();
 
 export default function ClientsPage() {
   const [clients, setClients] = useState([]);
@@ -44,7 +47,7 @@ export default function ClientsPage() {
   };
 
   const handleViewClient = (id) => {
-    window.location.href = `/clients/${id}`;
+	navigate(`/clients/${id}`);
   };
 
   const handleDeleteClient = async (id) => {
