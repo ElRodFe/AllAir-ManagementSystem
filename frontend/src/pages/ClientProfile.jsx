@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
@@ -11,7 +11,6 @@ import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
 import VehicleForm from "../components/VehicleForm";
 import useDebounce from "../utils/useDebounce";
-import { useNavigate } from "react-router-dom";
 
 import { getClientById } from "../services/clientService";
 import { getVehicles, deleteVehicle } from "../services/vehicleService";
