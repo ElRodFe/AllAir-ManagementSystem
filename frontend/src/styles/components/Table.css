@@ -85,3 +85,58 @@
   background: var(--gray-50);
   color: var(--gray-400);
 }
+
+/* Table Action Buttons */
+.table tbody button {
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.btn-details {
+  background: var(--color-blue-400);
+  color: var(--color-blue-600);
+  border-color: var(--color-blue-500);
+}
+
+.btn-details:hover {
+  background: var(--color-blue-500);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-edit {
+  background: var(--color-green-300);
+  color: var(--color-green-600);
+  border-color: var(--color-green-500);
+}
+
+.btn-edit:hover {
+  background: var(--color-green-500);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-delete {
+  background: var(--color-red-400);
+  color: var(--color-red-600);
+  border-color: var(--color-red-500);
+}
+
+.btn-delete:hover {
+  background: var(--color-red-500);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table tbody button:active {
+  transform: translateY(0);
+}

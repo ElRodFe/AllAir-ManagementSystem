@@ -21,7 +21,13 @@ load_dotenv()
 # ============================================
 # CONFIGURATION
 # ============================================
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise ValueError(
+        "SECRET_KEY environment variable is not set! "
+        "Please add SECRET_KEY to your .env file. "
+    )
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30  # Token expires in 30 minutes
 REFRESH_TOKEN_EXPIRE_DAYS = 7     # Refresh token expires in 7 days

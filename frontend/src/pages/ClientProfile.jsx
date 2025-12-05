@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import Header from "../components/Header";
 import SearchBar from "../components/SearchBar";
@@ -10,8 +10,10 @@ import VehiclesTable from "../components/VehiclesTable";
 import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
 import VehicleForm from "../components/VehicleForm";
+import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../utils/useToast";
 
 import { getClientById } from "../services/clientService";
 import { getVehicles, deleteVehicle } from "../services/vehicleService";
@@ -20,6 +22,8 @@ const navigate = useNavigate();
 
 export default function ClientProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const [client, setClient] = useState(null);
   const [vehicles, setVehicles] = useState([]);
@@ -95,9 +99,9 @@ export default function ClientProfile() {
     try {
       await deleteVehicle(vehicleId);
       setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
-      alert("Vehicle deleted");
+      toast.success("Vehicle deleted successfully");
     } catch (err) {
-      alert("Error deleting vehicle");
+      toast.error("Error deleting vehicle");
     }
   };
 
@@ -128,9 +132,50 @@ export default function ClientProfile() {
 
       <Header icon_url="/assets/user.svg" title="Client Details" />
 
+      <div style={{ 
+        margin: '2rem 0', 
+        display: 'flex', 
+        justifyContent: 'center',
+        padding: '0 2rem'
+      }}>
+        <button 
+          className="btn-back" 
+          onClick={() => navigate('/clients')}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: 'var(--color-green-400)',
+            color: 'var(--color-green-600)',
+            border: '2px solid var(--color-green-500)',
+            borderRadius: 'var(--radius-md)',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '600',
+            transition: 'all 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = 'var(--color-green-500)';
+            e.target.style.color = 'white';
+            e.target.style.transform = 'translateX(-3px)';
+            e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = 'var(--color-green-400)';
+            e.target.style.color = 'var(--color-green-600)';
+            e.target.style.transform = 'translateX(0)';
+            e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          ← Back to Clients
+        </button>
+      </div>
+
       <DetailsLayout title={client ? `Client #${client.id}` : "Client Details"}>
         {loading || !client ? (
-          <p>Loading client...</p>
+          <LoadingSpinner message="Loading client details..." />
         ) : (
           <>
             <DetailsSection title="Information">

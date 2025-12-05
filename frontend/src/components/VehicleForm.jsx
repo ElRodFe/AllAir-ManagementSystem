@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { createVehicle, updateVehicle } from "../services/vehicleService";
+import { useToast } from "../utils/useToast";
 
 export default function VehicleForm({ clientId, vehicle, onSuccess }) {
+  const toast = useToast();
   const [form, setForm] = useState({
     vehicle_type: vehicle?.vehicle_type || "",
     brand_model: vehicle?.brand_model || "",
@@ -22,18 +24,18 @@ export default function VehicleForm({ clientId, vehicle, onSuccess }) {
     try {
       if (vehicle) {
         await updateVehicle(vehicle.id, form);
-        alert("Vehicle updated!");
+        toast.success("Vehicle updated successfully!");
       } else {
         await createVehicle({
           ...form,
           owner_id: Number(clientId),
         });
-        alert("Vehicle created!");
+        toast.success("Vehicle created successfully!");
       }
 
       onSuccess?.();
     } catch (err) {
-      alert(err.response?.data?.detail || "Error saving vehicle");
+      toast.error(err.response?.data?.detail || "Error saving vehicle");
     } finally {
       setLoading(false);
     }

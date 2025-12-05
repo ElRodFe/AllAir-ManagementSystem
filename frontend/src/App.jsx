@@ -12,10 +12,12 @@ import Error500 from "./pages/Error500";
 import Clients from "./pages/Clients";
 import ClientProfile from "./pages/ClientProfile";
 import VehicleDetails from "./pages/VehicleDetails";
+import { ToastProvider } from "./utils/useToast";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <ToastProvider>
+      <BrowserRouter>
       <Routes>
         <Route
           path="/"
@@ -107,6 +109,7 @@ export default function App() {
         <Route path="/error/401" element={<Error401 />} />
         <Route path="/error/500" element={<Error500 />} />
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </ToastProvider>
   );
 }

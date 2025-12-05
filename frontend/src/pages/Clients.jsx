@@ -5,14 +5,17 @@ import Pagination from "../components/Paginations";
 import Modal from "../components/Modal";
 import ClientsTable from "../components/ClientsTable";
 import ClientForm from "../components/ClientForm";
+import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../utils/useToast";
 
 import { getClients, deleteClient } from "../services/clientService";
 
 const navigate = useNavigate();
 
 export default function ClientsPage() {
+  const toast = useToast();
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
@@ -56,10 +59,10 @@ export default function ClientsPage() {
     try {
       await deleteClient(id);
       setClients((prev) => prev.filter((c) => c.id !== id));
-      alert("Client deleted!");
+      toast.success("Client deleted successfully");
     } catch (err) {
       console.error("Error deleting client:", err);
-      alert("Error deleting client: " + (err.message || err));
+      toast.error("Error deleting client: " + (err.message || err));
     }
   };
 
@@ -103,11 +106,7 @@ export default function ClientsPage() {
   }, [filtered, page, pageSize]);
 
   if (loading) {
-    return (
-      <div className="dashboard">
-        <div className="loading">Loading clients...</div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading clients..." fullPage />;
   }
 
   return (

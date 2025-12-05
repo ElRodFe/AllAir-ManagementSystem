@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import DetailsLayout from "../components/DetailsLayout";
 import DetailsSection from "../components/DetailsSection";
 import DetailsInfoItem from "../components/DetailsInfoItem";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 import { getWorkOrderById } from "../services/workOrderService";
 import { getClientById } from "../services/clientService";
@@ -27,11 +28,52 @@ export default function WorkOrderDetails() {
     load();
   }, [id]);
 
-  if (!workOrder) return <p>Loading...</p>;
+  if (!workOrder) return <LoadingSpinner message="Loading work order details..." fullPage />;
 
   return (
     <>
       <Header icon_url="/assets/order.svg" title="Work Order Details" />
+
+      <div style={{ 
+        margin: '2rem 0', 
+        display: 'flex', 
+        justifyContent: 'center',
+        padding: '0 2rem'
+      }}>
+        <button 
+          className="btn-back" 
+          onClick={() => navigate('/work-orders')}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: 'var(--color-green-400)',
+            color: 'var(--color-green-600)',
+            border: '2px solid var(--color-green-500)',
+            borderRadius: 'var(--radius-md)',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '600',
+            transition: 'all 0.2s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = 'var(--color-green-500)';
+            e.target.style.color = 'white';
+            e.target.style.transform = 'translateX(-3px)';
+            e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = 'var(--color-green-400)';
+            e.target.style.color = 'var(--color-green-600)';
+            e.target.style.transform = 'translateX(0)';
+            e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+          }}
+        >
+          ← Back to Work Orders
+        </button>
+      </div>
 
       <DetailsLayout title={`Order #${workOrder.id}`}>
         <DetailsSection title="Information">
