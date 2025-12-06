@@ -9,11 +9,11 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
 import { useToast } from "../utils/useToast";
 import { useNavigate } from "react-router-dom";
-const navigate = useNavigate();
 
 import { getClients, deleteClient } from "../services/clientService";
 
 export default function ClientsPage() {
+  const navigate = useNavigate();
   const toast = useToast();
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState("");
