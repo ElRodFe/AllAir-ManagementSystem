@@ -16,7 +16,6 @@ import { ToastProvider } from "./utils/useToast";
 
 export default function App() {
   return (
-    <ToastProvider>
       <BrowserRouter>
       <Routes>
         <Route
@@ -110,6 +109,5 @@ export default function App() {
         <Route path="/error/500" element={<Error500 />} />
       </Routes>
       </BrowserRouter>
-    </ToastProvider>
   );
 }
