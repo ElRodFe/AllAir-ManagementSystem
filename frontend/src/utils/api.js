@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 // ============================================
 // AUTH FUNCTIONS
@@ -12,7 +12,7 @@ function authHeaders() {
   const token = getToken();
   return {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   };
 }
 
@@ -28,7 +28,7 @@ export async function loginUser(credentials) {
     },
     body: JSON.stringify({
       username: credentials.username,
-      password: credentials.password
+      password: credentials.password,
     }),
   });
 
@@ -52,7 +52,7 @@ export function logout() {
 
 export async function getClients() {
   const res = await fetch(`${API_URL}/clients/`, {
-    headers: authHeaders()
+    headers: authHeaders(),
   });
 
   if (res.status === 401) {
@@ -67,7 +67,7 @@ export async function getClients() {
 
 export async function getClientById(id) {
   const res = await fetch(`${API_URL}/clients/${id}`, {
-    headers: authHeaders()
+    headers: authHeaders(),
   });
 
   if (res.status === 401) {
@@ -120,7 +120,6 @@ export async function updateClient(id, body) {
   return res.json();
 }
 
-
 // ============================================
 // WORK ORDERS
 // ============================================
@@ -139,7 +138,7 @@ export async function createWorkOrder(data) {
 
 export async function getWorkOrders() {
   const res = await fetch(`${API_URL}/work-orders/`, {
-    headers: authHeaders()
+    headers: authHeaders(),
   });
 
   if (res.status === 401) {
@@ -158,7 +157,7 @@ export async function getWorkOrders() {
 
 export async function getWorkOrderById(id) {
   const res = await fetch(`${API_URL}/work-orders/${id}`, {
-    headers: authHeaders()
+    headers: authHeaders(),
   });
 
   if (res.status === 401) {
