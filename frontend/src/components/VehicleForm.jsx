@@ -1,18 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 export default function VehicleForm({ vehicle = null, onSubmit, onCancel }) {
-  const init = {
+  const [form, setForm] = useState(() => ({
     vehicle_type: vehicle?.vehicle_type || "",
     brand_model: vehicle?.brand_model || "",
     kilometers: vehicle?.kilometers || "",
     plate_number: vehicle?.plate_number || "",
-  };
-
-  const [form, setForm] = useState(init);
-
-  useEffect(() => {
-    setForm({ ...init });
-  }, [vehicle]);
+  }));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,14 +28,29 @@ export default function VehicleForm({ vehicle = null, onSubmit, onCancel }) {
 
   return (
     <form className="modal-form" onSubmit={submit}>
-      <label>Vehicle Type</label>
-      <input name="vehicle_type" value={form.vehicle_type} onChange={handleChange} required />
-
-      <label>Brand / Model</label>
-      <input name="brand_model" value={form.brand_model} onChange={handleChange} required />
-
-      <label>Kilometers</label>
+      <label htmlFor="vehicle-type">Vehicle Type</label>
       <input
+        id="vehicle-type"
+        name="vehicle_type"
+        type="text"
+        value={form.vehicle_type}
+        onChange={handleChange}
+        required
+      />
+
+      <label htmlFor="brand-model">Brand / Model</label>
+      <input
+        id="brand-model"
+        name="brand_model"
+        type="text"
+        value={form.brand_model}
+        onChange={handleChange}
+        required
+      />
+
+      <label htmlFor="kilometers">Kilometers</label>
+      <input
+        id="kilometers"
         type="number"
         name="kilometers"
         value={form.kilometers}
@@ -49,8 +58,15 @@ export default function VehicleForm({ vehicle = null, onSubmit, onCancel }) {
         required
       />
 
-      <label>Plate Number</label>
-      <input name="plate_number" value={form.plate_number} onChange={handleChange} required />
+      <label htmlFor="plate-number">Plate Number</label>
+      <input
+        id="plate-number"
+        name="plate_number"
+        type="text"
+        value={form.plate_number}
+        onChange={handleChange}
+        required
+      />
 
       <div className="modal-footer">
         <button type="button" className="btn warning" onClick={onCancel}>
