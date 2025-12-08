@@ -8,7 +8,7 @@ import Modal from "../components/Modal";
 import WorkOrderForm from "../components/WorkOrderForm";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
-import { useToast } from "../utils/useToast";
+import { useNotify } from "../contexts/NotificationContext";
 
 import {
   getWorkOrders,
@@ -24,7 +24,8 @@ function uniqueValues(items, key) {
 }
 
 export default function WorkOrders() {
-  const toast = useToast();
+  const { pushNotification } = useNotify();
+
   const [rawData, setRawData] = useState([]);
   const [clients, setClients] = useState([]);
   const [vehicles, setVehicles] = useState([]);
@@ -39,21 +40,18 @@ export default function WorkOrders() {
   });
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
-  // Modals
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
+  // UNIFIED MODAL STATE
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState(null);
 
   // Pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Load everything
+  // Load work orders + relations
   const loadData = async () => {
     setLoading(true);
-    setError("");
     try {
       const [ordersData, clientsData, vehiclesData] = await Promise.all([
         getWorkOrders(),
@@ -65,8 +63,7 @@ export default function WorkOrders() {
       setClients(clientsData || []);
       setVehicles(vehiclesData || []);
     } catch (err) {
-      console.error(err);
-      setError(err.message || "Failed to load data");
+      pushNotification("Error loading work orders.", "error");
     } finally {
       setLoading(false);
     }
@@ -76,46 +73,47 @@ export default function WorkOrders() {
     loadData();
   }, []);
 
-  // Handle CRUD
-  const handleCreate = async (formData) => {
+  // CREATE ORDER
+  const handleCreate = async (payload) => {
     try {
-      await createWorkOrder(formData);
+      await createWorkOrder(payload);
       await loadData();
-      setShowAddModal(false);
-      toast.success("Work order created successfully");
-    } catch (err) {
-      toast.error("Failed to create work order: " + err.message);
-    }
+      setModalOpen(false);
+      pushNotification("Work order created successfully!", "success");
+    } catch (err) {}
   };
 
-  const handleEdit = async (id, formData) => {
+  // EDIT ORDER
+  const handleEdit = async (id, payload) => {
     try {
-      await updateWorkOrder(id, formData);
+      await updateWorkOrder(id, payload);
       await loadData();
-      setEditModalOpen(false);
+      setModalOpen(false);
       setEditingOrder(null);
-      toast.success("Work order updated successfully");
-    } catch (err) {
-      toast.error("Failed to update: " + err.message);
-    }
+      pushNotification("Work order updated successfully!", "success");
+    } catch (err) {}
   };
 
+  // DELETE ORDER
   const handleDelete = async (id) => {
-    if (!confirm("Delete this work order?")) return;
+    if (!confirm("Delete this work order?")) {
+      pushNotification("Delete canceled.", "info");
+      return;
+    }
+
     try {
       await deleteWorkOrder(id);
       await loadData();
-      toast.success("Work order deleted successfully");
-    } catch (err) {
-      toast.error("Failed to delete: " + err.message);
-    }
+      pushNotification("Work order deleted!", "success");
+    } catch (err) {}
   };
 
-  // Join data: clients + vehicles
+  // JOIN_CLIENT + VEHICLE DATA
   const joinedOrders = useMemo(() => {
     return rawData.map((o) => {
       const client = clients.find((c) => c.id === o.client_id);
       const vehicle = vehicles.find((v) => v.id === o.vehicle_id);
+
       return {
         ...o,
         customer_name: client?.name || "Unknown",
@@ -128,101 +126,105 @@ export default function WorkOrders() {
     });
   }, [rawData, clients, vehicles]);
 
-  // Filters
-  const payment_status = useMemo(() => uniqueValues(rawData, "payment_status"), [rawData]);
-  const work_status = useMemo(() => uniqueValues(rawData, "work_status"), [rawData]);
-
-  // Full filtering + search + sorting
+  // APPLY SEARCH + FILTERS + SORT
   const filtered = useMemo(() => {
     let items = [...joinedOrders];
 
-    // Search
-    if (debouncedSearch) {
-      const s = debouncedSearch.toLowerCase();
+    const s = debouncedSearch.toLowerCase();
+    if (s) {
       items = items.filter(
-        (it) =>
-          `${it.id}`.includes(s) ||
-          it.customer_name.toLowerCase().includes(s) ||
-          (it.details || "").toLowerCase().includes(s) ||
-          (it.vehicle_plate || "").toLowerCase().includes(s)
+        (i) =>
+          `${i.id}`.includes(s) ||
+          (i.customer_name || "").toLowerCase().includes(s) ||
+          (i.details || "").toLowerCase().includes(s) ||
+          (i.vehicle_plate || "").toLowerCase().includes(s) ||
+          (i.vehicle_model || "").toLowerCase().includes(s) ||
+          (i.customer_phone || "").toLowerCase().includes(s)
       );
     }
 
-    // Filters
-    if (filters.payment_status) {
+    if (filters.payment_status)
       items = items.filter((i) => i.payment_status === filters.payment_status);
-    }
-    if (filters.work_status) {
-      items = items.filter((i) => i.work_status === filters.work_status);
-    }
 
-    // Sorting
+    if (filters.work_status) items = items.filter((i) => i.work_status === filters.work_status);
+
     items.sort((a, b) => {
-      const dA = new Date(a.entry_date);
-      const dB = new Date(b.entry_date);
-      return filters.order === "asc" ? dA - dB : dB - dA;
+      const da = new Date(a.entry_date);
+      const db = new Date(b.entry_date);
+      return filters.order === "asc" ? da - db : db - da;
     });
 
     return items;
   }, [joinedOrders, filters, debouncedSearch]);
 
-  // Pagination
+  // PAGINATION
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+
   useEffect(() => {
     if (page > totalPages) setPage(1);
-  }, [filtered.length, pageSize]);
+  }, [totalPages]);
 
   const pageItems = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filtered.slice(start, start + pageSize);
   }, [filtered, page, pageSize]);
 
-  // Loading state
+  // IF LOADING
   if (loading) {
-    return <LoadingSpinner message="Loading work orders..." fullPage />;
+    return <LoadingSpinner fullPage message="Loading work orders..." />;
   }
 
   return (
     <>
-      {/* Create modal */}
-      <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="New Work Order">
+      {/* UNIFIED CREATE/EDIT WORK ORDER MODAL */}
+      <Modal
+        open={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setEditingOrder(null);
+          pushNotification("Action canceled.", "info");
+        }}
+        title={editingOrder ? "Edit Work Order" : "New Work Order"}
+      >
         <WorkOrderForm
           clients={clients}
           vehicles={vehicles}
-          onSubmit={handleCreate}
-          onCancel={() => setShowAddModal(false)}
+          initialData={editingOrder}
+          onSubmit={(payload) =>
+            editingOrder ? handleEdit(editingOrder.id, payload) : handleCreate(payload)
+          }
+          onCancel={() => {
+            setModalOpen(false);
+            setEditingOrder(null);
+            pushNotification("Action canceled.", "info");
+          }}
         />
       </Modal>
 
-      {/* Edit modal */}
-      <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)} title="Edit Work Order">
-        {editingOrder && (
-          <WorkOrderForm
-            clients={clients}
-            vehicles={vehicles}
-            initialData={editingOrder}
-            onSubmit={(data) => handleEdit(editingOrder.id, data)}
-            onCancel={() => setEditModalOpen(false)}
-          />
-        )}
-      </Modal>
-
-      <Header icon_url="assets/order.svg" title="Work Orders" />
+      {/* HEADER */}
+      <Header icon_url="/assets/order.svg" title="Work Orders" />
 
       <div className="dashboard">
         <div className="app-shell">
-          <div className="page-header">
-            <h2 className="font-subtitle margin-bottom-md">Order List</h2>
-
-            <button className="btn add-btn" onClick={() => setShowAddModal(true)}>
+          {/* PAGE HEADER */}
+          <div className="page-header margin-bottom-md between">
+            <h2 className="font-subtitle">Order List</h2>
+            <button
+              className="btn add-btn"
+              onClick={() => {
+                setEditingOrder(null);
+                setModalOpen(true);
+              }}
+            >
               + New Order
             </button>
           </div>
 
+          {/* FILTERS + SEARCH */}
           <div className="controls between">
             <Filters
-              payment_status={payment_status}
-              work_status={work_status}
+              payment_status={uniqueValues(rawData, "payment_status")}
+              work_status={uniqueValues(rawData, "work_status")}
               selected={filters}
               onChange={(f) => {
                 setFilters(f);
@@ -233,22 +235,24 @@ export default function WorkOrders() {
             <SearchBar value={search} onChange={setSearch} />
           </div>
 
+          {/* TABLE */}
           <OrdersTable
             items={pageItems}
             onEdit={(order) => {
               setEditingOrder(order);
-              setEditModalOpen(true);
+              setModalOpen(true);
             }}
             onDelete={handleDelete}
           />
 
+          {/* PAGINATION */}
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={(p) => setPage(p)}
+            onPageChange={setPage}
             pageSize={pageSize}
-            onPageSizeChange={(s) => {
-              setPageSize(s);
+            onPageSizeChange={(size) => {
+              setPageSize(size);
               setPage(1);
             }}
           />
