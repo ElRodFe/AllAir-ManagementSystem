@@ -7,10 +7,16 @@ export default function Filters({ payment_status = [], work_status = [], selecte
 
   return (
     <div className="filters">
-      {/* Payment Status */}
-      <label className="filter-item">
-        <span className="label">Payment Status</span>
+      {/* PAYMENT STATUS */}
+      <div className="filter-item">
+        <label className="filter-label" htmlFor="filter-payment-status">
+          Payment Status
+        </label>
+
         <select
+          id="filter-payment-status"
+          name="payment_status"
+          className="filter-select"
           value={selected.payment_status || ""}
           onChange={(e) => set("payment_status", e.target.value)}
         >
@@ -21,34 +27,45 @@ export default function Filters({ payment_status = [], work_status = [], selecte
             </option>
           ))}
         </select>
-      </label>
+      </div>
 
-      {/* Work Status */}
-      <label className="filter-item">
-        <span className="label">Work Status</span>
+      {/* WORK STATUS */}
+      <div className="filter-item">
+        <label className="filter-label" htmlFor="filter-work-status">
+          Work Status
+        </label>
+
         <select
+          id="filter-work-status"
+          name="work_status"
+          className="filter-select"
           value={selected.work_status || ""}
           onChange={(e) => set("work_status", e.target.value)}
         >
           <option value="">All</option>
           {work_status.map((status) => (
             <option key={status} value={status}>
-              {status}
+              {normalize(status, /_/g, " ")}
             </option>
           ))}
         </select>
-      </label>
+      </div>
 
-      {/* Sort Order */}
-      <label className="filter-sort">
-        <span className="label">Sort Order</span>
+      {/* SORT ORDER */}
+      <div className="filter-sort">
+        <label className="filter-label" htmlFor="filter-sort">
+          Sort Order
+        </label>
+
         <button
-          className="sort-toggle"
+          id="filter-sort"
+          type="button"
+          className={`sort-toggle ${selected.order === "desc" ? "active" : ""}`}
           onClick={() => set("order", selected.order === "asc" ? "desc" : "asc")}
         >
           {selected.order === "asc" ? "Asc" : "Desc"}
         </button>
-      </label>
+      </div>
     </div>
   );
 }

@@ -47,6 +47,7 @@ export default function VehiclesTable({ items, onView, onEdit, onDelete }) {
                 {onView && (
                   <td>
                     <button
+                      className="btn-details"
                       onClick={(e) => {
                         e.stopPropagation();
                         onView(v);
@@ -60,6 +61,7 @@ export default function VehiclesTable({ items, onView, onEdit, onDelete }) {
                 {onEdit && (
                   <td>
                     <button
+                      className="btn-edit"
                       onClick={(e) => {
                         e.stopPropagation();
                         onEdit(v);
@@ -73,6 +75,7 @@ export default function VehiclesTable({ items, onView, onEdit, onDelete }) {
                 {onDelete && (
                   <td>
                     <button
+                      className="btn-delete"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDelete(v.id);

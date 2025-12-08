@@ -18,9 +18,9 @@ export default function ClientsTable({ items, onView, onEdit, onDelete }) {
             <th>Full Name</th>
             <th>Phone</th>
             <th>Email</th>
-            {onView && <th>Details</th>}
-            {onEdit && <th>Edit</th>}
-            {onDelete && <th>Delete</th>}
+            <th></th>
+            <th></th>
+            <th></th>
           </tr>
         </thead>
 
@@ -45,6 +45,7 @@ export default function ClientsTable({ items, onView, onEdit, onDelete }) {
                 {onView && (
                   <td>
                     <button
+                      className="btn-details"
                       onClick={(e) => {
                         e.stopPropagation();
                         onView(c.id);
@@ -58,6 +59,7 @@ export default function ClientsTable({ items, onView, onEdit, onDelete }) {
                 {onEdit && (
                   <td>
                     <button
+                      className="btn-edit"
                       onClick={(e) => {
                         e.stopPropagation();
                         onEdit(c);
@@ -71,6 +73,7 @@ export default function ClientsTable({ items, onView, onEdit, onDelete }) {
                 {onDelete && (
                   <td>
                     <button
+                      className="btn-delete"
                       onClick={(e) => {
                         e.stopPropagation();
                         onDelete(c.id);

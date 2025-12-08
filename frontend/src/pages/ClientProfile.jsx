@@ -12,15 +12,21 @@ import Modal from "../components/Modal";
 import VehicleForm from "../components/VehicleForm";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
-import { useToast } from "../utils/useToast";
+import { useNotify } from "../contexts/NotificationContext";
 
 import { getClientById } from "../services/clientService";
-import { getVehicles, deleteVehicle } from "../services/vehicleService";
+
+import {
+  getVehicles,
+  createVehicle,
+  updateVehicle,
+  deleteVehicle,
+} from "../services/vehicleService";
 
 export default function ClientProfile() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const toast = useToast();
+  const { pushNotification } = useNotify();
 
   const [client, setClient] = useState(null);
   const [vehicles, setVehicles] = useState([]);
@@ -29,25 +35,30 @@ export default function ClientProfile() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
 
-  // pagination
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(4);
-
-  const [showEditModal, setShowEditModal] = useState(false);
+  // modal
+  const [showModal, setShowModal] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState(null);
 
   const [loading, setLoading] = useState(true);
 
+  // pagination
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(4);
+
+  // Load client + vehicles
   useEffect(() => {
     async function load() {
       try {
         setLoading(true);
+
         const c = await getClientById(id);
-        const allVehicles = await getVehicles();
-        const owned = allVehicles.filter((v) => v.owner_id === Number(id));
+        const all = await getVehicles();
+        const owned = all.filter((v) => v.owner_id === Number(id));
 
         setClient(c);
         setVehicles(owned);
+      } catch (err) {
+        pushNotification("Error loading client details.", "error");
       } finally {
         setLoading(false);
       }
@@ -55,11 +66,55 @@ export default function ClientProfile() {
     load();
   }, [id]);
 
-  // SEARCH FILTER
-  const filteredVehicles = useMemo(() => {
-    if (!debouncedSearch) return vehicles;
+  // CREATE VEHICLE
+  const handleCreate = async (payload) => {
+    try {
+      await createVehicle({ ...payload, owner_id: Number(id) });
 
+      const all = await getVehicles();
+      setVehicles(all.filter((v) => v.owner_id === Number(id)));
+
+      setShowModal(false);
+      setEditingVehicle(null);
+
+      pushNotification("Vehicle created successfully!", "success");
+    } catch (err) {}
+  };
+
+  // UPDATE VEHICLE
+  const handleUpdate = async (payload) => {
+    try {
+      await updateVehicle(editingVehicle.id, payload);
+
+      const all = await getVehicles();
+      setVehicles(all.filter((v) => v.owner_id === Number(id)));
+
+      setShowModal(false);
+      setEditingVehicle(null);
+
+      pushNotification("Vehicle updated successfully!", "success");
+    } catch (err) {}
+  };
+
+  // DELETE VEHICLE
+  const handleDeleteVehicle = async (vehicleId) => {
+    if (!window.confirm("Delete this vehicle?")) {
+      pushNotification("Delete canceled.", "info");
+      return;
+    }
+
+    try {
+      await deleteVehicle(vehicleId);
+      setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
+
+      pushNotification("Vehicle deleted!", "success");
+    } catch (err) {}
+  };
+
+  // SEARCH
+  const filteredVehicles = useMemo(() => {
     const s = debouncedSearch.toLowerCase();
+    if (!s) return vehicles;
 
     return vehicles.filter((v) => {
       return (
@@ -79,151 +134,94 @@ export default function ClientProfile() {
     if (page > totalPages) setPage(1);
   }, [totalPages]);
 
-  const pagedVehicles = useMemo(() => {
+  const pageItems = useMemo(() => {
     const start = (page - 1) * pageSize;
     return filteredVehicles.slice(start, start + pageSize);
   }, [filteredVehicles, page, pageSize]);
 
-  // table actions
-  const handleEditVehicle = (vehicle) => {
-    setEditingVehicle(vehicle);
-    setShowEditModal(true);
-  };
-
-  const handleDeleteVehicle = async (vehicleId) => {
-    if (!window.confirm("Are you sure you want to delete this vehicle?")) return;
-
-    try {
-      await deleteVehicle(vehicleId);
-      setVehicles((prev) => prev.filter((v) => v.id !== vehicleId));
-      toast.success("Vehicle deleted successfully");
-    } catch (err) {
-      toast.error("Error deleting vehicle");
-    }
-  };
+  if (loading || !client) {
+    return <LoadingSpinner fullPage message="Loading client details..." />;
+  }
 
   return (
     <>
-      {/* Modal */}
+      {/* CREATE/EDIT VEHICLE MODAL */}
       <Modal
-        open={showEditModal}
+        open={showModal}
         onClose={() => {
-          setShowEditModal(false);
+          setShowModal(false);
           setEditingVehicle(null);
+          pushNotification("Action canceled.", "info");
         }}
-        title={editingVehicle ? "Edit Vehicle" : "Add Vehicle"}
       >
         <VehicleForm
-          clientId={id}
           vehicle={editingVehicle}
-          onSuccess={async () => {
-            // Reload vehicles after create/update
-            const all = await getVehicles();
-            setVehicles(all.filter(v => v.owner_id === Number(id)));
-
-            setShowEditModal(false);
+          onSubmit={(payload) => (editingVehicle ? handleUpdate(payload) : handleCreate(payload))}
+          onCancel={() => {
+            setShowModal(false);
             setEditingVehicle(null);
+            pushNotification("Action canceled.", "info");
           }}
         />
       </Modal>
 
+      {/* HEADER */}
       <Header icon_url="/assets/user.svg" title="Client Details" />
 
-      <div style={{ 
-        margin: '2rem 0', 
-        display: 'flex', 
-        justifyContent: 'center',
-        padding: '0 2rem'
-      }}>
-        <button 
-          className="btn-back" 
-          onClick={() => navigate('/clients')}
-          style={{
-            padding: '12px 24px',
-            backgroundColor: 'var(--color-green-400)',
-            color: 'var(--color-green-600)',
-            border: '2px solid var(--color-green-500)',
-            borderRadius: 'var(--radius-md)',
-            cursor: 'pointer',
-            fontSize: '16px',
-            fontWeight: '600',
-            transition: 'all 0.2s ease',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = 'var(--color-green-500)';
-            e.target.style.color = 'white';
-            e.target.style.transform = 'translateX(-3px)';
-            e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = 'var(--color-green-400)';
-            e.target.style.color = 'var(--color-green-600)';
-            e.target.style.transform = 'translateX(0)';
-            e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
-          }}
-        >
-          ← Back to Clients
-        </button>
-      </div>
+      <DetailsLayout title={`Client #${client.id}`}>
+        <div className="back-container">
+          <button className="btn-back" onClick={() => navigate(-1)}>
+            ← Back
+          </button>
+        </div>
 
-      <DetailsLayout title={client ? `Client #${client.id}` : "Client Details"}>
-        {loading || !client ? (
-          <LoadingSpinner message="Loading client details..." />
-        ) : (
-          <>
-            <DetailsSection title="Information">
-              <DetailsInfoItem label="Full Name" value={client.name} full />
-              <DetailsInfoItem label="Phone Number" value={client.phone_number} />
-              <DetailsInfoItem label="Email Address" value={client.email} />
-            </DetailsSection>
+        <DetailsSection title="Information">
+          <DetailsInfoItem label="Full Name" value={client.name} full />
+          <DetailsInfoItem label="Phone Number" value={client.phone_number} />
+          <DetailsInfoItem label="Email Address" value={client.email} />
+        </DetailsSection>
 
-            {/* VEHICLES */}
-            <DetailsSection title="Vehicles Owned">
-              <div className="details-info-item full">
-                <div className="between margin-bottom-md controls">
-                  <button
-                    className="btn add-btn"
-                    onClick={() => {
-                      setEditingVehicle(null); // create mode
-                      setShowEditModal(true);
-                    }}
-                  >
-                    + Add Vehicle
-                  </button>
-
-                  <div className="search-bar-wrapper">
-                    <SearchBar
-                      value={search}
-                      onChange={setSearch}
-                      placeholder="Search vehicles..."
-                    />
-                  </div>
-                </div>
-                <VehiclesTable
-                  items={pagedVehicles}
-                  onView={(v) => navigate(`/vehicle/${v.id}`)}
-                  onEdit={handleEditVehicle}
-                  onDelete={handleDeleteVehicle}
-                />
-              </div>
-
-              <Pagination
-                currentPage={page}
-                totalPages={totalPages}
-                onPageChange={(p) => setPage(Math.max(1, Math.min(totalPages, p)))}
-                pageSize={pageSize}
-                onPageSizeChange={(size) => {
-                  setPageSize(size);
-                  setPage(1);
+        {/* VEHICLES */}
+        <DetailsSection title="Vehicles Owned">
+          <div className="details-info-item full">
+            <div className="between margin-bottom-md controls">
+              <button
+                className="btn add-btn"
+                onClick={() => {
+                  setEditingVehicle(null);
+                  setShowModal(true);
                 }}
-              />
-            </DetailsSection>
-          </>
-        )}
+              >
+                + Add Vehicle
+              </button>
+
+              <div className="search-bar-wrapper">
+                <SearchBar value={search} onChange={setSearch} placeholder="Search vehicles..." />
+              </div>
+            </div>
+
+            <VehiclesTable
+              items={pageItems}
+              onView={(v) => navigate(`/vehicle/${v.id}`)}
+              onEdit={(veh) => {
+                setEditingVehicle(veh);
+                setShowModal(true);
+              }}
+              onDelete={handleDeleteVehicle}
+            />
+
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              pageSize={pageSize}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPage(1);
+              }}
+            />
+          </div>
+        </DetailsSection>
       </DetailsLayout>
     </>
   );

@@ -2,7 +2,7 @@ import axios from "axios";
 import { pushAxiosNotification } from "../contexts/axiosNotify";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://127.0.0.1:8000",
+  baseURL: "http://127.0.0.1:8000",
   withCredentials: false,
 });
 
@@ -18,20 +18,22 @@ api.interceptors.response.use(
   (response) => response,
 
   async (error) => {
-    // Trigger global toast notification
-    pushAxiosNotification(error);
-
     const originalRequest = error.config;
 
-    // Prevent refresh
-    if (
-      originalRequest.url.includes("/auth/login") ||
-      originalRequest.url.includes("/auth/refresh")
-    ) {
+    // Handle login errors separately
+    if (originalRequest.url.includes("/auth/login")) {
       return Promise.reject(error);
     }
 
-    //  Token refresh logic
+    // Show notifications for ALL other API errors
+    pushAxiosNotification(error);
+
+    // Prevent refresh for refresh itself
+    if (originalRequest.url.includes("/auth/refresh")) {
+      return Promise.reject(error);
+    }
+
+    // Token refresh logic
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -43,14 +45,11 @@ api.interceptors.response.use(
 
         const { access_token } = res.data;
 
-        // Save new token
         localStorage.setItem("access_token", access_token);
 
-        // Retry original request
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed and Log out
+      } catch {
         localStorage.clear();
         window.location.href = "/";
       }
