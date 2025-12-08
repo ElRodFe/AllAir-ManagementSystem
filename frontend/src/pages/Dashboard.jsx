@@ -10,13 +10,15 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
 import Modal from "../components/Modal";
 import WorkOrderForm from "../components/WorkOrderForm";
-import { useToast } from "../utils/useToast";
+import { useNotify } from "../contexts/NotificationContext";
+
 import {
   getWorkOrders,
   createWorkOrder,
   updateWorkOrder,
   deleteWorkOrder,
 } from "../services/workOrderService";
+
 import { getClients } from "../services/clientService";
 import { getVehicles } from "../services/vehicleService";
 
@@ -25,29 +27,34 @@ function uniqueValues(items, key) {
 }
 
 export default function Dashboard() {
-  const toast = useToast();
+  const { pushNotification } = useNotify();
+
   const [user, setUser] = useState(null);
   const [rawData, setRawData] = useState([]);
   const [clients, setClients] = useState([]);
   const [vehicles, setVehicles] = useState([]);
+
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
+  // UNIFIED MODAL
+  const [modalOpen, setModalOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState(null);
 
+  // Filters
   const [filters, setFilters] = useState({
     payment_status: "",
     work_status: "",
     order: "asc",
   });
 
+  // Pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
+  // Load user + data
   useEffect(() => {
     const stored = localStorage.getItem("user");
     if (stored) setUser(JSON.parse(stored));
@@ -63,65 +70,65 @@ export default function Dashboard() {
         getClients(),
         getVehicles(),
       ]);
+
       setRawData(ordersData || []);
       setClients(clientsData || []);
       setVehicles(vehiclesData || []);
     } catch (err) {
-      console.error("Error loading data:", err);
-      setError(err.message || "Error loading data");
+      setError("Error loading dashboard data");
+      pushNotification("Error loading dashboard data.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  // Create work order handler
-  const handleCreateWorkOrderSubmit = async (formData) => {
+  // CREATE WORK ORDER
+  const handleCreate = async (formData) => {
     try {
       await createWorkOrder(formData);
       await loadData();
-      setShowAddModal(false);
-      toast.success("Work order created successfully");
-    } catch (err) {
-      console.error("Error creating work order:", err);
-      toast.error("Error creating order: " + (err.message || err));
-    }
+      setModalOpen(false);
+      pushNotification("Work order created successfully!", "success");
+    } catch (err) {}
   };
 
-  const handleEditWorkOrderSubmit = async (id, formData) => {
+  // EDIT WORK ORDER
+  const handleEdit = async (id, formData) => {
     try {
       await updateWorkOrder(id, formData);
       await loadData();
-      setEditModalOpen(false);
+      setModalOpen(false);
       setEditingOrder(null);
-      toast.success("Work order updated successfully");
-    } catch (err) {
-      console.error("Error editing work order:", err);
-      toast.error("Error editing order: " + (err.message || err));
-    }
+      pushNotification("Work order updated successfully!", "success");
+    } catch (err) {}
   };
 
   const openEditModal = (order) => {
     setEditingOrder(order);
-    setEditModalOpen(true);
+    setModalOpen(true);
   };
 
   const closeEditModal = () => {
     setEditingOrder(null);
-    setEditModalOpen(false);
+    setModalOpen(false);
+    pushNotification("Action canceled.", "info");
   };
 
+  // DELETE WORK ORDER
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this work order?")) return;
+    if (!confirm("Are you sure you want to delete this work order?")) {
+      pushNotification("Delete canceled.", "info");
+      return;
+    }
+
     try {
       await deleteWorkOrder(id);
       setRawData((prev) => prev.filter((o) => o.id !== id));
-      toast.success("Work order deleted successfully");
-    } catch (err) {
-      console.error("Error deleting work order:", err);
-      toast.error("Error deleting work order: " + (err.message || err));
-    }
+      pushNotification("Work order deleted!", "success");
+    } catch (err) {}
   };
 
+  // JOIN CLIENT + VEHICLE INFO
   const ordersWithCustomerInfo = useMemo(() => {
     return rawData.map((order) => {
       const cust = clients.find((c) => c.id === order.client_id);
@@ -132,7 +139,6 @@ export default function Dashboard() {
         customer_name: cust ? cust.name : "Unknown",
         customer_phone: cust ? cust.phone_number : "N/A",
         customer_email: cust ? cust.email : "N/A",
-
         vehicle_plate: vehicle ? vehicle.plate_number : "N/A",
         vehicle_model: vehicle ? vehicle.brand_model : "N/A",
         vehicle_type: vehicle ? vehicle.vehicle_type : "N/A",
@@ -143,6 +149,7 @@ export default function Dashboard() {
   const payment_status = useMemo(() => uniqueValues(rawData, "payment_status"), [rawData]);
   const work_status = useMemo(() => uniqueValues(rawData, "work_status"), [rawData]);
 
+  // SEARCH + FILTER + SORT
   const filtered = useMemo(() => {
     let items = [...ordersWithCustomerInfo];
 
@@ -165,9 +172,9 @@ export default function Dashboard() {
     if (filters.work_status) items = items.filter((i) => i.work_status === filters.work_status);
 
     items.sort((a, b) => {
-      const dA = new Date(a.entry_date);
-      const dB = new Date(b.entry_date);
-      return filters.order === "asc" ? dA - dB : dB - dA;
+      const da = new Date(a.entry_date);
+      const db = new Date(b.entry_date);
+      return filters.order === "asc" ? da - db : db - da;
     });
 
     return items;
@@ -201,27 +208,21 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* Add work order modal */}
-      <Modal open={showAddModal} onClose={() => setShowAddModal(false)} title="Add Work Order">
+      {/* UNIFIED CREATE/EDIT MODAL */}
+      <Modal
+        open={modalOpen}
+        onClose={closeEditModal}
+        title={editingOrder ? "Edit Work Order" : "Add Work Order"}
+      >
         <WorkOrderForm
           clients={clients}
           vehicles={vehicles}
-          onSubmit={handleCreateWorkOrderSubmit}
-          onCancel={() => setShowAddModal(false)}
+          initialData={editingOrder}
+          onSubmit={(formData) =>
+            editingOrder ? handleEdit(editingOrder.id, formData) : handleCreate(formData)
+          }
+          onCancel={closeEditModal}
         />
-      </Modal>
-
-      {/* Edit work order modal */}
-      <Modal open={editModalOpen} onClose={closeEditModal} title="Edit Work Order">
-        {editingOrder && (
-          <WorkOrderForm
-            clients={clients}
-            vehicles={vehicles}
-            initialData={editingOrder}
-            onSubmit={(formData) => handleEditWorkOrderSubmit(editingOrder.id, formData)}
-            onCancel={closeEditModal}
-          />
-        )}
       </Modal>
 
       <Header icon_url="assets/board.svg" title="Dashboard" />
@@ -229,13 +230,14 @@ export default function Dashboard() {
       <div className="dashboard">
         {error && (
           <div className="error-banner">
-            Error: {error}
-            <button onClick={loadData} style={{ marginLeft: "10px" }}>
+            {error}
+            <button onClick={loadData} style={{ marginLeft: 10 }}>
               Retry
             </button>
           </div>
         )}
 
+        {/* --------- OVERVIEW --------- */}
         <h2 className="font-title margin-bottom-md">Overview</h2>
 
         <div className="overview-box flex">
@@ -265,10 +267,17 @@ export default function Dashboard() {
           />
         </div>
 
+        {/* --------- WORK ORDERS LIST --------- */}
         <h2 className="font-title margin-bottom-lg">Activity Feed</h2>
 
         <div className="app-shell">
-          <button className="add-btn btn" onClick={() => setShowAddModal(true)}>
+          <button
+            className="btn add-btn"
+            onClick={() => {
+              setEditingOrder(null);
+              setModalOpen(true);
+            }}
+          >
             + New Order
           </button>
 
@@ -285,20 +294,25 @@ export default function Dashboard() {
               }}
             />
 
-            <div className="search-bar-wrapper">
-              <SearchBar value={search} onChange={setSearch} />
-            </div>
+            <SearchBar value={search} onChange={setSearch} />
           </div>
 
-          <OrdersTable items={pageItems} onEdit={openEditModal} onDelete={handleDelete} />
+          <OrdersTable
+            items={pageItems}
+            onEdit={(order) => {
+              setEditingOrder(order);
+              setModalOpen(true);
+            }}
+            onDelete={handleDelete}
+          />
 
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={(p) => setPage(Math.max(1, Math.min(totalPages, p)))}
+            onPageChange={setPage}
             pageSize={pageSize}
-            onPageSizeChange={(s) => {
-              setPageSize(s);
+            onPageSizeChange={(size) => {
+              setPageSize(size);
               setPage(1);
             }}
           />

@@ -2,16 +2,19 @@
 .flex {
   display: flex;
 }
+
 .center {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .between {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
+
 .column {
   display: flex;
   flex-direction: column;
@@ -22,6 +25,7 @@
 .text-muted {
   color: var(--text-muted);
 }
+
 .text-lg {
   font-size: var(--fs-body-lg);
 }
@@ -89,4 +93,38 @@
 .error-msg {
   margin: 0;
   color: var(--color-red-600);
+}
+
+/* Container for back button */
+.back-container {
+  position: absolute;
+  top: var(--space-5);
+  right: var(--space-5);
+  display: flex;
+  justify-content: center;
+}
+
+/* Back Button */
+.btn-back {
+  padding: 12px;
+  background-color: var(--color-green-400);
+  color: var(--color-green-600);
+  border: 2px solid var(--color-green-500);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Hover state */
+.btn-back:hover {
+  background-color: var(--color-green-500);
+  color: white;
+  transform: translateX(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }

@@ -1,91 +1,66 @@
 import React, { useState, useEffect } from "react";
-import { createClient, updateClient } from "../services/clientService";
 
-export default function ClientForm({ initialData, onSuccess, onCancel }) {
-  const [form, setForm] = useState({
+export default function ClientForm({ initialData = null, onSubmit, onCancel }) {
+  const init = {
     name: "",
     phone_number: "",
     email: "",
-  });
+    ...initialData,
+  };
 
-  const [error, setError] = useState("");
+  const [form, setForm] = useState(init);
 
-  // Load initial values for editing
   useEffect(() => {
-    if (initialData) {
-      setForm({
-        name: initialData.name || "",
-        phone_number: initialData.phone_number || "",
-        email: initialData.email || "",
-      });
-    }
+    setForm({ ...init });
   }, [initialData]);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  const submit = (e) => {
     e.preventDefault();
-    setError("");
 
-    try {
-      if (initialData) {
-        // EDIT
-        await updateClient(initialData.id, form);
-      } else {
-        // CREATE
-        await createClient(form);
-      }
+    const payload = {
+      name: form.name.trim(),
+      phone_number: form.phone_number.trim(),
+      email: form.email || null,
+    };
 
-      onSuccess();
-    } catch (err) {
-      setError(err.message || "Error submitting form");
-    }
+    onSubmit(payload);
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form className="modal-form" onSubmit={submit}>
+      <label>Full Name</label>
+      <input name="name" type="text" value={form.name} onChange={handleChange} required />
 
-      {error && <div className="form-error">{error}</div>}
-
-      <label className="form-label">Full Name</label>
+      <label>Phone Number</label>
       <input
-        type="text"
-        name="name"
-        className="form-input"
-        value={form.name}
-        onChange={handleChange}
-        required
-      />
-
-      <label className="form-label">Phone Number</label>
-      <input
-        type="text"
         name="phone_number"
-        className="form-input"
+        type="text"
         value={form.phone_number}
         onChange={handleChange}
         required
       />
 
-      <label className="form-label">Email</label>
+      <label>Email</label>
       <input
-        type="email"
         name="email"
-        className="form-input"
+        type="email"
         value={form.email}
         onChange={handleChange}
         placeholder="Optional"
       />
 
-      <div className="form-actions">
-        <button type="submit" className="btn primary">
-          {initialData ? "Save Changes" : "Create Client"}
+      <div className="modal-footer">
+        <button type="button" className="btn warning" onClick={onCancel}>
+          Cancel
         </button>
 
-        <button type="button" className="btn" onClick={onCancel}>
-          Cancel
+        <button type="submit" className="btn create">
+          {initialData ? "Save Changes" : "Create Client"}
         </button>
       </div>
     </form>

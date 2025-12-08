@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { registerNotification } from "./notificationEmitter";
 import NotificationItem from "../components/notifications/NotificationItem";
 
@@ -8,7 +8,7 @@ export function NotificationProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
 
   function pushNotification(message, type = "error") {
-    const id = Date.now();
+    const id = crypto.randomUUID();
 
     setNotifications((prev) => [...prev, { id, message, type }]);
 
@@ -17,7 +17,9 @@ export function NotificationProvider({ children }) {
     }, 4000);
   }
 
-  registerNotification(pushNotification);
+  useEffect(() => {
+    registerNotification(pushNotification);
+  }, []);
 
   return (
     <NotificationContext.Provider value={{ pushNotification }}>

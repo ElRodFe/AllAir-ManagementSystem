@@ -232,8 +232,8 @@ export default function WorkOrderForm({
         <button className="btn warning" type="button" onClick={onCancel}>
           Cancel
         </button>
-        <button className="btn create" type="submit">
-          Create Order
+        <button type="submit" className="btn create">
+          {initialData ? "Save Changes" : "Create Order"}
         </button>
       </div>
     </form>

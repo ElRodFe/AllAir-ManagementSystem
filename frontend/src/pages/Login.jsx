@@ -56,7 +56,7 @@ export default function Login() {
 
       navigate("/dashboard");
     } catch (err) {
-      console.log(err);
+      pushNotification("Invalid username or password", "error");
     }
   }
 
@@ -100,44 +100,6 @@ export default function Login() {
       <button type="submit" className="login-btn btn">
         Login
       </button>
-      <div style={{ marginTop: "20px" }}>
-        <h3>Notification Test</h3>
-
-        <button
-          type="button"
-          className="btn"
-          onClick={() => pushNotification("Success test message!", "success")}
-        >
-          Test Success
-        </button>
-
-        <button
-          type="button"
-          className="btn"
-          onClick={() => pushNotification("Error test message!", "error")}
-          style={{ marginLeft: "10px" }}
-        >
-          Test Error
-        </button>
-
-        <button
-          type="button"
-          className="btn"
-          onClick={() => pushNotification("Warning test message!", "warning")}
-          style={{ marginLeft: "10px" }}
-        >
-          Test Warning
-        </button>
-
-        <button
-          type="button"
-          className="btn"
-          onClick={() => pushNotification("Info test message!", "info")}
-          style={{ marginLeft: "10px" }}
-        >
-          Test Info
-        </button>
-      </div>
     </form>
   );
 }

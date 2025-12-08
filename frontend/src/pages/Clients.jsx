@@ -7,14 +7,15 @@ import ClientsTable from "../components/ClientsTable";
 import ClientForm from "../components/ClientForm";
 import LoadingSpinner from "../components/LoadingSpinner";
 import useDebounce from "../utils/useDebounce";
-import { useToast } from "../utils/useToast";
+import { useNotify } from "../contexts/NotificationContext";
 import { useNavigate } from "react-router-dom";
 
-import { getClients, deleteClient } from "../services/clientService";
+import { getClients, createClient, updateClient, deleteClient } from "../services/clientService";
 
 export default function ClientsPage() {
   const navigate = useNavigate();
-  const toast = useToast();
+  const { pushNotification } = useNotify();
+
   const [clients, setClients] = useState([]);
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebounce(search, 300);
@@ -22,17 +23,14 @@ export default function ClientsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [editingClient, setEditingClient] = useState(null);
 
   // Pagination
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  useEffect(() => {
-    loadClients();
-  }, []);
-
+  // Load clients
   const loadClients = async () => {
     setLoading(true);
     setError("");
@@ -41,58 +39,72 @@ export default function ClientsPage() {
       const data = await getClients();
       setClients(data || []);
     } catch (err) {
-      console.error("Error loading clients:", err);
-      setError(err.message || "Could not load clients");
+      setError(err.message || "Failed to load clients");
+      pushNotification("Error loading clients.", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleViewClient = (id) => {
-    navigate(`/clients/${id}`);
+  useEffect(() => {
+    loadClients();
+  }, []);
+
+  // CREATE
+  const handleCreate = async (payload) => {
+    try {
+      await createClient(payload);
+      await loadClients();
+      setShowModal(false);
+      setEditingClient(null);
+
+      pushNotification("Client created successfully!", "success");
+    } catch (err) {
+      /* axios interceptor handles server error */
+    }
   };
 
+  // UPDATE
+  const handleUpdate = async (payload) => {
+    try {
+      await updateClient(editingClient.id, payload);
+      await loadClients();
+      setShowModal(false);
+      setEditingClient(null);
+
+      pushNotification("Client updated successfully!", "success");
+    } catch (err) {}
+  };
+
+  // DELETE
   const handleDeleteClient = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this client?")) return;
+    if (!confirm("Delete this client?")) {
+      pushNotification("Delete canceled.", "info");
+      return;
+    }
 
     try {
       await deleteClient(id);
       setClients((prev) => prev.filter((c) => c.id !== id));
-      toast.success("Client deleted successfully");
-    } catch (err) {
-      console.error("Error deleting client:", err);
-      toast.error("Error deleting client: " + (err.message || err));
-    }
+
+      pushNotification("Client deleted!", "success");
+    } catch (err) {}
   };
 
-  const handleEditClient = (client) => {
-    setEditingClient(client);
-    setShowCreateModal(true);
-  };
-
-  // ---- FILTERING ----
+  // FILTERING + SEARCH
   const filtered = useMemo(() => {
-    let items = [...clients];
+    const s = debouncedSearch.toLowerCase();
+    if (!s) return clients;
 
-    if (debouncedSearch) {
-      const s = debouncedSearch.toLowerCase();
-
-      items = items.filter(
-        (c) =>
-          c.name.toLowerCase().includes(s) ||
-          String(c.phone_number || "")
-            .toLowerCase()
-            .includes(s) ||
-          String(c.email || "")
-            .toLowerCase()
-            .includes(s)
-      );
-    }
-
-    return items;
+    return clients.filter(
+      (c) =>
+        c.name.toLowerCase().includes(s) ||
+        (c.phone_number || "").toLowerCase().includes(s) ||
+        (c.email || "").toLowerCase().includes(s)
+    );
   }, [clients, debouncedSearch]);
 
-  // ---- PAGINATION ----
+  // PAGINATION
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
 
   useEffect(() => {
@@ -110,72 +122,62 @@ export default function ClientsPage() {
 
   return (
     <>
+      {/* CREATE / EDIT MODAL */}
       <Modal
-        open={showCreateModal}
+        open={showModal}
         onClose={() => {
-          setShowCreateModal(false);
+          setShowModal(false);
           setEditingClient(null);
+          pushNotification("Action canceled.", "info");
         }}
         title={editingClient ? "Edit Client" : "Create New Client"}
       >
         <ClientForm
           initialData={editingClient}
+          onSubmit={(payload) => (editingClient ? handleUpdate(payload) : handleCreate(payload))}
           onCancel={() => {
-            setShowCreateModal(false);
+            setShowModal(false);
             setEditingClient(null);
-          }}
-          onSuccess={() => {
-            setShowCreateModal(false);
-            setEditingClient(null);
-            loadClients();
+            pushNotification("Action canceled.", "info");
           }}
         />
       </Modal>
 
-
+      {/* HEADER */}
       <Header icon_url="/assets/user.svg" title="Clients" />
 
       <div className="dashboard">
-        {error && (
-          <div className="error-banner">
-            Error: {error}
-            <button onClick={loadClients} style={{ marginLeft: 10 }}>
-              Retry
+        <div className="app-shell">
+          {/* PAGE HEADER */}
+          <div className="page-header margin-bottom-md between">
+            <h2 className="font-subtitle">Client List</h2>
+
+            <button className="btn add-btn" onClick={() => setShowModal(true)}>
+              + New Client
             </button>
           </div>
-        )}
 
-        <div className="app-shell">
-          <div className="app-header">
-            <h2 className="font-subtitle margin-bottom-md">Client List</h2>
-
-            <div className="between margin-bottom-md controls">
-              <button className="btn add-btn" onClick={() => setShowCreateModal(true)}>
-                + New Client
-              </button>
-
-              <div className="search-bar-wrapper">
-                <SearchBar
-                  value={search}
-                  onChange={setSearch}
-                  placeholder="Search Client..."
-                  ariaLabel="Search clients"
-                />
-              </div>
-            </div>
+          {/* SEARCH */}
+          <div className="controls between">
+            <SearchBar value={search} onChange={setSearch} placeholder="Search Client..." />
           </div>
 
+          {/* TABLE */}
           <ClientsTable
             items={pageItems}
-            onView={handleViewClient}
-            onEdit={handleEditClient}
+            onView={(id) => navigate(`/clients/${id}`)}
+            onEdit={(client) => {
+              setEditingClient(client);
+              setShowModal(true);
+            }}
             onDelete={handleDeleteClient}
           />
 
+          {/* PAGINATION */}
           <Pagination
             currentPage={page}
             totalPages={totalPages}
-            onPageChange={(p) => setPage(Math.max(1, Math.min(totalPages, p)))}
+            onPageChange={setPage}
             pageSize={pageSize}
             onPageSizeChange={(size) => {
               setPageSize(size);

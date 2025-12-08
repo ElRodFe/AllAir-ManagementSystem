@@ -1,4 +1,5 @@
 .details-page {
+  position: relative;
   padding: var(--space-6);
   height: calc(100vh - 90px);
   display: flex;

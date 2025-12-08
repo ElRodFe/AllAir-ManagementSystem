@@ -4,6 +4,7 @@
   padding: 6px;
   border: 1px solid var(--gray-200);
   height: 33px;
+  max-width: 280px;
 }
 .searchbar-input {
   background: none;
