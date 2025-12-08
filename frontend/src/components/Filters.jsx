@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useCallback } from "react";
 import "../styles/components/Filters.css";
 import { normalize } from "../utils/util";
 
 export default function Filters({ payment_status = [], work_status = [], selected, onChange }) {
-  const set = (key, val) => onChange({ ...selected, [key]: val });
+  const set = useCallback(
+    (key, val) => onChange({ ...selected, [key]: val }),
+    [onChange, selected]
+  );
 
   return (
     <div className="filters">
