@@ -53,14 +53,29 @@ export default function VehicleDetails() {
         setLoading(true);
 
         const v = await getVehicleById(id);
+        if (!v) {
+          pushNotification("Vehicle not found.", "error");
+          navigate("/clients");
+          return;
+        }
         setVehicle(v);
 
-        const ownerData = await getClientById(v.owner_id);
-        setOwner(ownerData);
+        try {
+          const ownerData = await getClientById(v.owner_id);
+          setOwner(ownerData);
+        } catch (err) {
+          pushNotification("Failed to load vehicle owner.", "error");
+        }
 
-        const orders = await getWorkOrders();
-        const filtered = orders.filter((o) => o.vehicle_id === Number(id));
-        setRawOrders(filtered);
+        try {
+          const orders = await getWorkOrders();
+          const filtered = orders.filter((o) => o.vehicle_id === Number(id));
+          setRawOrders(filtered);
+        } catch (err) {
+          pushNotification("Failed to load work orders.", "error");
+        }
+      } catch (err) {
+        pushNotification("Error loading vehicle details.", "error");
       } finally {
         setLoading(false);
       }
@@ -69,37 +84,42 @@ export default function VehicleDetails() {
     load();
   }, [id]);
 
-  // CREATE
+  // CREATE WORK ORDER
   const handleCreate = async (payload) => {
     try {
       await createWorkOrder({ ...payload, vehicle_id: Number(id) });
 
+      // Reload orders
       const all = await getWorkOrders();
-      const filtered = all.filter((o) => o.vehicle_id === Number(id));
-      setRawOrders(filtered);
+      setRawOrders(all.filter((o) => o.vehicle_id === Number(id)));
 
       setShowModal(false);
       setEditingOrder(null);
+
       pushNotification("Work order created successfully!", "success");
-    } catch (err) {}
+    } catch (err) {
+      pushNotification("Failed to create work order.", "error");
+    }
   };
 
-  // UPDATE
+  // UPDATE WORK ORDER
   const handleUpdate = async (payload) => {
     try {
       await updateWorkOrder(editingOrder.id, payload);
 
       const all = await getWorkOrders();
-      const filtered = all.filter((o) => o.vehicle_id === Number(id));
-      setRawOrders(filtered);
+      setRawOrders(all.filter((o) => o.vehicle_id === Number(id)));
 
       setShowModal(false);
       setEditingOrder(null);
-      pushNotification("Work order updated!", "success");
-    } catch (err) {}
+
+      pushNotification("Work order updated successfully!", "success");
+    } catch (err) {
+      pushNotification("Failed to update work order.", "error");
+    }
   };
 
-  // DELETE
+  // DELETE WORK ORDER
   const handleDelete = async (orderId) => {
     if (!confirm("Delete this work order?")) {
       pushNotification("Delete canceled.", "info");
@@ -110,14 +130,15 @@ export default function VehicleDetails() {
       await deleteWorkOrder(orderId);
 
       const all = await getWorkOrders();
-      const filtered = all.filter((o) => o.vehicle_id === Number(id));
-      setRawOrders(filtered);
+      setRawOrders(all.filter((o) => o.vehicle_id === Number(id)));
 
       pushNotification("Work order deleted!", "success");
-    } catch (err) {}
+    } catch (err) {
+      pushNotification("Failed to delete work order.", "error");
+    }
   };
 
-  // JOIN orders with extra info (same as WorkOrders.jsx)
+  // JOIN DATA for display
   const joinedOrders = useMemo(() => {
     return rawOrders.map((o) => ({
       ...o,
@@ -166,23 +187,25 @@ export default function VehicleDetails() {
 
   return (
     <>
-      {/* CREATE / EDIT ORDER MODAL */}
+      {/* UNIFIED CREATE/EDIT WORK ORDER MODAL */}
       <Modal
         open={showModal}
         onClose={() => {
           setShowModal(false);
           setEditingOrder(null);
+          pushNotification("Action canceled.", "info");
         }}
         title={editingOrder ? "Edit Work Order" : "New Work Order"}
       >
         <WorkOrderForm
-          clients={[owner]} // owner only
-          vehicles={[vehicle]} // this vehicle only
+          clients={[owner]}
+          vehicles={[vehicle]}
           initialData={editingOrder}
           onSubmit={(payload) => (editingOrder ? handleUpdate(payload) : handleCreate(payload))}
           onCancel={() => {
             setShowModal(false);
             setEditingOrder(null);
+            pushNotification("Action canceled.", "info");
           }}
         />
       </Modal>
@@ -192,7 +215,12 @@ export default function VehicleDetails() {
 
       <DetailsLayout title={`Vehicle #${vehicle.id}`}>
         <div className="back-container">
-          <button className="btn-back" onClick={() => navigate(-1)}>
+          <button
+            className="btn-back"
+            onClick={() => {
+              navigate(-1);
+            }}
+          >
             ← Back
           </button>
         </div>
