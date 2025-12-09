@@ -144,3 +144,7 @@ pytest -q
     Dicmary's --> "I have not failed. I've just found 10,000 ways that won't work," Thomas A. Edison
     Nico's --> "No matter how bad it is, or how bad it gets" - Unknown
     Steven's --> "Waste no more time arguing what a good man should be. Be One.” – Marcus Aurelius
+
+## Username and Password for login
+    username: EliasE
+    password: admin123
